@@ -5,22 +5,22 @@ import { IUserRepository } from 'src/types/user/user.repository.interface';
 import { Repository } from 'typeorm';
 
 @Injectable()
-export class UserRepository implements IUserRepository {
+export class UserTypeormRepository implements IUserRepository {
   constructor(
     @InjectRepository(User)
-    private users: Repository<User>,
+    private repo: Repository<User>,
   ) {}
 
   private qb(alias = 'user') {
-    return this.users.createQueryBuilder(alias);
+    return this.repo.createQueryBuilder(alias);
   }
 
-  create(user: Partial<User>): User {
-    return this.users.create(user);
+  createEntity(user: Partial<User>): User {
+    return this.repo.create(user);
   }
 
   async save(user: User): Promise<User> {
-    return await this.users.save(user);
+    return await this.repo.save(user);
   }
 
   async findOneById(id: number): Promise<User | null> {

@@ -1,13 +1,12 @@
 import { Controller, Get, Param } from '@nestjs/common';
-
-import { UserRepository } from './user.repository';
+import { IUserService } from 'src/types/user/user.service.interface';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(private readonly userService: IUserService) {}
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.userRepository.findOneById(+id);
+    return this.userService.findOneById(+id);
   }
 }

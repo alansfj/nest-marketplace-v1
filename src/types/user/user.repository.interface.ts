@@ -1,13 +1,13 @@
 import { User } from 'src/entities/user.entity';
 
-export interface IUserRepository {
-  create(data: Partial<User>): User;
+export abstract class IUserRepository {
+  abstract createEntity(data: Partial<User>): User;
 
-  save(user: User): Promise<User>;
+  abstract save(user: User): Promise<User>;
 
-  findOneById(id: number): Promise<User | null>;
+  abstract findOneById(id: number): Promise<User | null>;
 
-  findOneByEmail(email: string): Promise<User | null>;
+  abstract findOneByEmail(email: string): Promise<User | null>;
 
-  findOneBy(options: Partial<User>): Promise<User | null>;
+  abstract findOneBy(options: Partial<User>): Promise<User | null>;
 }
