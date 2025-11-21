@@ -3,27 +3,27 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
 import { RegisterDtoInput } from 'src/modules/auth/dtos/register/register.dto.input';
-import { UserService } from 'src/modules/user/user.service';
+import { UserRepository } from '../user/user.repository';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private userService: UserService,
+    private userRepository: UserRepository,
     private jwtService: JwtService,
   ) {}
 
   async registerUser(registerDto: RegisterDtoInput) {
-    const user = await this.userService.findOneByEmail(registerDto.email);
+    const user = await this.userRepository.findOneByEmail(registerDto.email);
 
     if (!user) {
-      return this.userService.create(registerDto);
+      return this.userRepository.create(registerDto);
     }
 
     throw new BadRequestException('user with that email already exists.');
   }
 
   async validateUser(email: string, password: string): Promise<any> {
-    const user = await this.userService.findOneByEmail(email);
+    const user = await this.userRepository.findOneByEmail(email);
 
     if (!user) return null;
 
