@@ -35,6 +35,14 @@ To generate migrations use the command
 npx typeorm-ts-node-commonjs migration:generate migrations/<migration-name> -d src/data-source.ts -p
 ```
 
+## Create Empty Migrations
+
+To create an empty migration use the command
+
+```bash
+npx typeorm migration:create migrations/<migration-name>
+```
+
 ## Run Migrations
 
 To run pending migrations use the command 
