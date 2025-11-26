@@ -1,7 +1,17 @@
 import { Exclude } from 'class-transformer';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  CreateDateColumn,
+  DeleteDateColumn,
+  UpdateDateColumn,
+  OneToOne,
+} from 'typeorm';
 import { Store } from './store.entity';
 import { Product } from './product.entity';
+import { UserBalance } from './user-balance.entity';
 
 @Entity('users')
 export class User {
@@ -26,4 +36,16 @@ export class User {
 
   @OneToMany(() => Product, (product) => product.user)
   products: Product[];
+
+  @CreateDateColumn()
+  createdDate: Date;
+
+  @UpdateDateColumn()
+  updatedDate: Date;
+
+  @DeleteDateColumn()
+  deletedDate: Date;
+
+  @OneToOne(() => UserBalance, (userBalance) => userBalance.user)
+  userBalance: UserBalance;
 }

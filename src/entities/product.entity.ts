@@ -10,6 +10,7 @@ import {
 import { Store } from './store.entity';
 import { Subcategory } from './subcategory.entity';
 import { User } from './user.entity';
+import { Currency } from '../types/currency.type';
 
 @Entity('products')
 export class Product {
@@ -40,7 +41,11 @@ export class Product {
   })
   price: number;
 
-  @Column()
+  @Column({
+    type: 'enum',
+    enum: Currency,
+    default: Currency.MXN,
+  })
   currency: string;
 
   @Column()
