@@ -29,6 +29,12 @@ export class UserService implements IUserService {
   // methods with logic
 
   async registerUser(registerDto: RegisterDtoInput): Promise<User> {
+    const exists = await this.userRepository.findOneByEmail(registerDto.email);
+
+    if (exists) {
+      throw new BadRequestException('User with that email already exists');
+    }
+
     const { password, ...rest } = registerDto;
 
     const hashedPassword = await bcrypt.hash(
