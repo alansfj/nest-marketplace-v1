@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
 import { User } from '../../entities/user.entity';
@@ -6,12 +6,14 @@ import { RegisterDtoInput } from '../auth/dtos/register/register.dto.input';
 import { ConfigService } from '@nestjs/config';
 import { IUserRepository } from 'src/types/user/user.repository.interface';
 import { IUserService } from 'src/types/user/user.service.interface';
+import { IUserBalanceService } from 'src/types/user-balance/user-balance.service.interface';
 
 @Injectable()
 export class UserService implements IUserService {
   constructor(
-    private readonly userRepository: IUserRepository,
     private readonly configService: ConfigService,
+    private readonly userRepository: IUserRepository,
+    private readonly userBalanceService: IUserBalanceService,
   ) {}
 
   // methods without logic
@@ -34,11 +36,19 @@ export class UserService implements IUserService {
       this.configService.get<number>('SALT_ROUNDS'),
     );
 
-    const newUser = this.userRepository.createEntity({
+    const newUserEntity = User.create({
       ...rest,
       password: hashedPassword,
     });
 
-    return await this.userRepository.save(newUser);
+    if (newUserEntity.error) {
+      throw new BadRequestException(newUserEntity.error);
+    }
+
+    const newUser = await this.userRepository.save(newUserEntity.value);
+
+    await this.userBalanceService.createForNewUser(newUser);
+
+    return newUser;
   }
 }

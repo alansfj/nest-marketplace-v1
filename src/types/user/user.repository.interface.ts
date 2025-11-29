@@ -1,8 +1,6 @@
 import { User } from 'src/entities/user.entity';
 
 export abstract class IUserRepository {
-  abstract createEntity(data: Partial<User>): User;
-
   abstract save(user: User): Promise<User>;
 
   abstract findOneById(id: number): Promise<User | null>;

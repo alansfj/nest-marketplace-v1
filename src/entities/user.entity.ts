@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { Exclude } from 'class-transformer';
 import {
   Entity,
@@ -12,11 +13,29 @@ import {
 import { Store } from './store.entity';
 import { Product } from './product.entity';
 import { UserBalance } from './user-balance.entity';
+import { nonEmptyStringSchema } from '../common/schemas/not-empty-string.schema';
+import { NewEntityResult } from '../types/create-entity-result.type';
+
+const createUserEntitySchema = z.object({
+  firstName: nonEmptyStringSchema(),
+  lastName: nonEmptyStringSchema(),
+  email: nonEmptyStringSchema().email(),
+  password: nonEmptyStringSchema(),
+});
+
+type createUserEntityType = Required<z.infer<typeof createUserEntitySchema>>;
 
 @Entity('users')
 export class User {
+  @Exclude()
+  readonly __brand = 'User';
+
+  private constructor(dto: createUserEntityType) {
+    Object.assign(this, dto);
+  }
+
   @PrimaryGeneratedColumn()
-  id: number;
+  readonly id: number;
 
   @Column({ unique: true, length: 100 })
   email: string;
@@ -38,14 +57,30 @@ export class User {
   products: Product[];
 
   @CreateDateColumn()
-  createdDate: Date;
+  readonly createdDate: Date;
 
   @UpdateDateColumn()
-  updatedDate: Date;
+  readonly updatedDate: Date;
 
   @DeleteDateColumn()
-  deletedDate: Date;
+  readonly deletedDate: Date;
 
   @OneToOne(() => UserBalance, (userBalance) => userBalance.user)
   userBalance: UserBalance;
+
+  // methods
+
+  static create(dto: createUserEntityType): NewEntityResult<User> {
+    const result = createUserEntitySchema.safeParse(dto);
+
+    if (!result.success) {
+      const message = result.error.errors
+        .map((e) => `${e.path.join('.')}: ${e.message}`)
+        .join(', ');
+
+      return { value: null, error: message };
+    }
+
+    return { value: new User(dto), error: null };
+  }
 }

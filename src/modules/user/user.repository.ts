@@ -15,10 +15,6 @@ export class UserTypeormRepository implements IUserRepository {
     return this.repo.createQueryBuilder(alias);
   }
 
-  createEntity(user: Partial<User>): User {
-    return this.repo.create(user);
-  }
-
   async save(user: User): Promise<User> {
     return await this.repo.save(user);
   }

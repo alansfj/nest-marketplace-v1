@@ -6,9 +6,10 @@ import { User } from '../../entities/user.entity';
 import { UserTypeormRepository } from './user.repository';
 import { IUserRepository } from 'src/types/user/user.repository.interface';
 import { IUserService } from 'src/types/user/user.service.interface';
+import { UserBalanceModule } from '../user-balance/user-balance.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [TypeOrmModule.forFeature([User]), UserBalanceModule],
   controllers: [UserController],
   providers: [
     {

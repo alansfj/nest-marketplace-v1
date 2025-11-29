@@ -10,11 +10,33 @@ import {
 } from 'typeorm';
 import { User } from './user.entity';
 import { Currency } from '../types/currency.type';
+import { z } from 'zod';
+import { NewEntityResult } from 'src/types/create-entity-result.type';
+import { Exclude } from 'class-transformer';
+
+const createUserBalanceEntitySchema = z.object({
+  user: z.object({
+    __brand: z.literal('User'),
+  }),
+  balance: z.number().gte(0),
+  currency: z.nativeEnum(Currency),
+});
+
+type createUserBalanceEntityType = Required<
+  z.infer<typeof createUserBalanceEntitySchema>
+>;
 
 @Entity('user_balance')
 export class UserBalance {
+  @Exclude()
+  readonly __brand = 'UserBalance';
+
+  private constructor(dto: createUserBalanceEntityType) {
+    Object.assign(this, dto);
+  }
+
   @PrimaryGeneratedColumn()
-  id: number;
+  readonly id: number;
 
   @OneToOne(() => User, { nullable: false })
   @JoinColumn()
@@ -37,11 +59,29 @@ export class UserBalance {
   currency: string;
 
   @CreateDateColumn()
-  createdDate: Date;
+  readonly createdDate: Date;
 
   @UpdateDateColumn()
-  updatedDate: Date;
+  readonly updatedDate: Date;
 
   @DeleteDateColumn()
-  deletedDate: Date;
+  readonly deletedDate: Date;
+
+  // methods
+
+  static create(
+    dto: createUserBalanceEntityType,
+  ): NewEntityResult<UserBalance> {
+    const result = createUserBalanceEntitySchema.safeParse(dto);
+
+    if (!result.success) {
+      const message = result.error.errors
+        .map((e) => `${e.path.join('.')}: ${e.message}`)
+        .join(', ');
+
+      return { value: null, error: message };
+    }
+
+    return { value: new UserBalance(dto), error: null };
+  }
 }

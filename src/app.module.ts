@@ -8,6 +8,7 @@ import { AuthModule } from 'src/modules/auth/auth.module';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { validate } from 'src/common/utils/env-validation';
 import { dataSourceOptions } from './data-source';
+import { UserBalanceModule } from './modules/user-balance/user-balance.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { dataSourceOptions } from './data-source';
     }),
     UserModule,
     AuthModule,
+    UserBalanceModule,
   ],
   providers: [
     {
