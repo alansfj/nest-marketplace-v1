@@ -1,17 +1,22 @@
-import { Expose } from 'class-transformer';
+import { Exclude } from 'class-transformer';
 
 export class RegisterDtoOutput {
-  @Expose()
   id: number;
 
-  @Expose()
   email: string;
 
-  @Expose()
   firstName: string;
 
-  @Expose()
   lastName: string;
+
+  @Exclude()
+  createdDate: Date;
+
+  @Exclude()
+  updatedDate: Date;
+
+  @Exclude()
+  deletedDate: Date;
 
   // @Expose()
   // get fullName(): string {
