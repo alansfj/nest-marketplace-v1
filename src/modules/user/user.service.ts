@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { Transactional } from 'typeorm-transactional';
 
 import { User } from '../../entities/user.entity';
 import { RegisterDtoInput } from '../auth/dtos/register/register.dto.input';
@@ -28,6 +29,7 @@ export class UserService implements IUserService {
 
   // methods with logic
 
+  @Transactional()
   async registerUser(registerDto: RegisterDtoInput): Promise<User> {
     const exists = await this.userRepository.findOneByEmail(registerDto.email);
 
