@@ -11,8 +11,10 @@ export class UserBalanceTypeormRepository implements IUserBalanceRepository {
     private repo: Repository<UserBalance>,
   ) {}
 
-  private qb(alias = 'userBalance') {
-    return this.repo.createQueryBuilder(alias);
+  private readonly TABLE_ALIAS = 'USER_BALANCE';
+
+  private qb() {
+    return this.repo.createQueryBuilder(this.TABLE_ALIAS);
   }
 
   async save(userBalance: UserBalance): Promise<UserBalance> {

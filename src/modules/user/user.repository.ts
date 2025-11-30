@@ -11,7 +11,7 @@ export class UserTypeormRepository implements IUserRepository {
     private repo: Repository<User>,
   ) {}
 
-  private readonly TABLE_ALIAS = 'user';
+  private readonly TABLE_ALIAS = 'USER';
 
   private qb() {
     return this.repo.createQueryBuilder(this.TABLE_ALIAS);
