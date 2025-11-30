@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 
 import { User, UserSelectableColumns } from 'src/entities/user.entity';
 import { IUserRepository } from 'src/types/user/user.repository.interface';
+import { PrimitiveColumns } from 'src/types/selectable-columns.type';
 
 @Injectable()
 export class UserTypeormRepository implements IUserRepository {
@@ -52,8 +53,11 @@ export class UserTypeormRepository implements IUserRepository {
       .getOne();
   }
 
-  async findOneBy(options: Partial<User>): Promise<User | null> {
-    const qb = this.qb();
+  async findOneEqualBy<T extends UserSelectableColumns>(
+    options: Partial<Record<UserSelectableColumns, PrimitiveColumns>>,
+    select?: T[],
+  ): Promise<Pick<User, T> | null> {
+    const qb = this.qbSelectedColumns(select);
 
     Object.entries(options).forEach(([key, value]) => {
       qb.andWhere(`${this.TABLE_ALIAS}.${key} = :${key}`, { [key]: value });

@@ -1,4 +1,5 @@
 import { User, UserSelectableColumns } from 'src/entities/user.entity';
+import { PrimitiveColumns } from '../selectable-columns.type';
 
 export abstract class IUserRepository {
   abstract save(user: User): Promise<User>;
@@ -13,5 +14,8 @@ export abstract class IUserRepository {
     select?: T[],
   ): Promise<Pick<User, T> | null>;
 
-  abstract findOneBy(options: Partial<User>): Promise<User | null>;
+  abstract findOneEqualBy<T extends UserSelectableColumns>(
+    options: Partial<Record<UserSelectableColumns, PrimitiveColumns>>,
+    select?: T[],
+  ): Promise<Pick<User, T> | null>;
 }
