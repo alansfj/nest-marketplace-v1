@@ -32,8 +32,17 @@ export class UserTypeormRepository implements IUserRepository {
     return await qb.where('user.id = :id', { id }).getOne();
   }
 
-  async findOneByEmail(email: string): Promise<User | null> {
-    return await this.qb().where('user.email = :email', { email }).getOne();
+  async findOneByEmail<T extends UserSelectableColumns>(
+    email: string,
+    select?: T[],
+  ): Promise<Pick<User, T> | null> {
+    const qb = this.qb();
+
+    if (select?.length) {
+      qb.select(select.map((col) => `user.${col}`));
+    }
+
+    return await qb.where('user.email = :email', { email }).getOne();
   }
 
   async findOneBy(options: Partial<User>): Promise<User | null> {

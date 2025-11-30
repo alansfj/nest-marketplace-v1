@@ -8,7 +8,10 @@ export abstract class IUserRepository {
     select?: T[],
   ): Promise<Pick<User, T> | null>;
 
-  abstract findOneByEmail(email: string): Promise<User | null>;
+  abstract findOneByEmail<T extends UserSelectableColumns>(
+    email: string,
+    select?: T[],
+  ): Promise<Pick<User, T> | null>;
 
   abstract findOneBy(options: Partial<User>): Promise<User | null>;
 }

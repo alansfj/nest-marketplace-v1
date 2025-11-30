@@ -22,7 +22,13 @@ export class AuthService {
     email: string,
     password: string,
   ): Promise<AuthUser | null> {
-    const user = await this.userService.findOneByEmail(email);
+    const user = await this.userService.findOneByEmail(email, [
+      'id',
+      'password',
+      'email',
+      'firstName',
+      'lastName',
+    ]);
 
     if (!user) return null;
 

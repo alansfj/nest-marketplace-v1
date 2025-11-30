@@ -26,17 +26,20 @@ export class UserService implements IUserService {
     return await this.userRepository.findOneById(id, select);
   }
 
-  async findOneByEmail(email: string): Promise<User | null> {
-    return await this.userRepository.findOneByEmail(email);
+  async findOneByEmail<T extends UserSelectableColumns>(
+    email: string,
+    select?: T[],
+  ): Promise<Pick<User, T> | null> {
+    return await this.userRepository.findOneByEmail(email, select);
   }
 
   // methods with logic
 
   @Transactional()
   async registerUser(registerDto: RegisterDtoInput): Promise<User> {
-    const exists = await this.userRepository.findOneByEmail(registerDto.email);
+    const userExists = await this.findOneByEmail(registerDto.email, ['id']);
 
-    if (exists) {
+    if (userExists) {
       throw new BadRequestException('User with that email already exists');
     }
 

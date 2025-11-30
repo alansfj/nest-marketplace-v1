@@ -7,7 +7,10 @@ export abstract class IUserService {
     select?: T[],
   ): Promise<Pick<User, T> | null>;
 
-  abstract findOneByEmail(email: string): Promise<User | null>;
+  abstract findOneByEmail<T extends UserSelectableColumns>(
+    email: string,
+    select?: T[],
+  ): Promise<Pick<User, T> | null>;
 
   abstract registerUser(dto: RegisterDtoInput): Promise<User>;
 }
