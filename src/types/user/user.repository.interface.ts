@@ -3,10 +3,10 @@ import { User, UserSelectableColumns } from 'src/entities/user.entity';
 export abstract class IUserRepository {
   abstract save(user: User): Promise<User>;
 
-  abstract findOneById(
+  abstract findOneById<T extends UserSelectableColumns>(
     id: number,
-    select?: UserSelectableColumns[],
-  ): Promise<User | null>;
+    select?: T[],
+  ): Promise<Pick<User, T> | null>;
 
   abstract findOneByEmail(email: string): Promise<User | null>;
 

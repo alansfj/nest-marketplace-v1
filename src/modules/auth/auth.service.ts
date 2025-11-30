@@ -18,7 +18,10 @@ export class AuthService {
     return this.userService.registerUser(registerDto);
   }
 
-  async validateUser(email: string, password: string): Promise<AuthUser> {
+  async validateUser(
+    email: string,
+    password: string,
+  ): Promise<AuthUser | null> {
     const user = await this.userService.findOneByEmail(email);
 
     if (!user) return null;

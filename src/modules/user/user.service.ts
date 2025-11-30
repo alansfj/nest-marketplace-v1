@@ -19,10 +19,10 @@ export class UserService implements IUserService {
 
   // methods without logic
 
-  async findOneById(
+  async findOneById<T extends UserSelectableColumns>(
     id: number,
-    select?: UserSelectableColumns[],
-  ): Promise<User | null> {
+    select?: T[],
+  ): Promise<Pick<User, T> | null> {
     return await this.userRepository.findOneById(id, select);
   }
 
@@ -44,7 +44,7 @@ export class UserService implements IUserService {
 
     const hashedPassword = await bcrypt.hash(
       password,
-      this.configService.get<number>('SALT_ROUNDS'),
+      this.configService.get<number>('SALT_ROUNDS')!,
     );
 
     const newUserEntity = User.create({

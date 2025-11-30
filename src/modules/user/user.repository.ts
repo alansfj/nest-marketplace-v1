@@ -19,10 +19,10 @@ export class UserTypeormRepository implements IUserRepository {
     return await this.repo.save(user);
   }
 
-  async findOneById(
+  async findOneById<T extends UserSelectableColumns>(
     id: number,
-    select?: UserSelectableColumns[],
-  ): Promise<User | null> {
+    select?: T[],
+  ): Promise<Pick<User, T> | null> {
     const qb = this.qb();
 
     if (select?.length) {

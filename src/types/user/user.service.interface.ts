@@ -2,10 +2,10 @@ import { User, UserSelectableColumns } from 'src/entities/user.entity';
 import { RegisterDtoInput } from 'src/modules/auth/dtos/register/register.dto.input';
 
 export abstract class IUserService {
-  abstract findOneById(
+  abstract findOneById<T extends UserSelectableColumns>(
     id: number,
-    select?: UserSelectableColumns[],
-  ): Promise<User | null>;
+    select?: T[],
+  ): Promise<Pick<User, T> | null>;
 
   abstract findOneByEmail(email: string): Promise<User | null>;
 
