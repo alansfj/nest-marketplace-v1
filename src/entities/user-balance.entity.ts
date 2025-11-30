@@ -1,3 +1,5 @@
+import { z } from 'zod';
+import { Exclude } from 'class-transformer';
 import {
   Column,
   CreateDateColumn,
@@ -8,13 +10,13 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
 import { User } from './user.entity';
 import { Currency } from '../types/currency.type';
-import { z } from 'zod';
 import { NewEntityResult } from 'src/types/create-entity-result.type';
-import { Exclude } from 'class-transformer';
+import { validateNewEntity } from 'src/common/utils/validate-new-entity';
 
-const createUserBalanceEntitySchema = z.object({
+const newEntitySchema = z.object({
   user: z.object({
     __brand: z.literal('User'),
   }),
@@ -22,16 +24,14 @@ const createUserBalanceEntitySchema = z.object({
   currency: z.nativeEnum(Currency),
 });
 
-type createUserBalanceEntityType = Required<
-  z.infer<typeof createUserBalanceEntitySchema>
->;
+type newEntityDto = Required<z.infer<typeof newEntitySchema>>;
 
 @Entity('user_balance')
 export class UserBalance {
   @Exclude()
   readonly __brand = 'UserBalance';
 
-  private constructor(dto: createUserBalanceEntityType) {
+  private constructor(dto: newEntityDto) {
     Object.assign(this, dto);
   }
 
@@ -69,18 +69,10 @@ export class UserBalance {
 
   // methods
 
-  static create(
-    dto: createUserBalanceEntityType,
-  ): NewEntityResult<UserBalance> {
-    const result = createUserBalanceEntitySchema.safeParse(dto);
+  static create(dto: newEntityDto): NewEntityResult<UserBalance> {
+    const newEntityError = validateNewEntity(newEntitySchema, dto);
 
-    if (!result.success) {
-      const message = result.error.errors
-        .map((e) => `${e.path.join('.')}: ${e.message}`)
-        .join(', ');
-
-      return { value: null, error: message };
-    }
+    if (newEntityError) return newEntityError;
 
     return { value: new UserBalance(dto), error: null };
   }

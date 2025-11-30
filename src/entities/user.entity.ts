@@ -10,27 +10,29 @@ import {
   UpdateDateColumn,
   OneToOne,
 } from 'typeorm';
+
 import { Store } from './store.entity';
 import { Product } from './product.entity';
 import { UserBalance } from './user-balance.entity';
 import { nonEmptyStringSchema } from '../common/schemas/not-empty-string.schema';
 import { NewEntityResult } from '../types/create-entity-result.type';
+import { validateNewEntity } from 'src/common/utils/validate-new-entity';
 
-const createUserEntitySchema = z.object({
+const newEntitySchema = z.object({
   firstName: nonEmptyStringSchema(),
   lastName: nonEmptyStringSchema(),
   email: nonEmptyStringSchema().email(),
   password: nonEmptyStringSchema(),
 });
 
-type createUserEntityType = Required<z.infer<typeof createUserEntitySchema>>;
+type newEntityDto = Required<z.infer<typeof newEntitySchema>>;
 
 @Entity('users')
 export class User {
   @Exclude()
   readonly __brand = 'User';
 
-  private constructor(dto: createUserEntityType) {
+  private constructor(dto: newEntityDto) {
     Object.assign(this, dto);
   }
 
@@ -70,16 +72,10 @@ export class User {
 
   // methods
 
-  static create(dto: createUserEntityType): NewEntityResult<User> {
-    const result = createUserEntitySchema.safeParse(dto);
+  static create(dto: newEntityDto): NewEntityResult<User> {
+    const newEntityError = validateNewEntity(newEntitySchema, dto);
 
-    if (!result.success) {
-      const message = result.error.errors
-        .map((e) => `${e.path.join('.')}: ${e.message}`)
-        .join(', ');
-
-      return { value: null, error: message };
-    }
+    if (newEntityError) return newEntityError;
 
     return { value: new User(dto), error: null };
   }
