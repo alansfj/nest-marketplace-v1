@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/entities/user.entity';
+import { User, UserSelectableColumns } from 'src/entities/user.entity';
 import { IUserRepository } from 'src/types/user/user.repository.interface';
 import { Repository } from 'typeorm';
 
@@ -19,8 +19,17 @@ export class UserTypeormRepository implements IUserRepository {
     return await this.repo.save(user);
   }
 
-  async findOneById(id: number): Promise<User | null> {
-    return await this.qb().where('user.id = :id', { id }).getOne();
+  async findOneById(
+    id: number,
+    select?: UserSelectableColumns[],
+  ): Promise<User | null> {
+    const qb = this.qb();
+
+    if (select?.length) {
+      qb.select(select.map((col) => `user.${col}`));
+    }
+
+    return await qb.where('user.id = :id', { id }).getOne();
   }
 
   async findOneByEmail(email: string): Promise<User | null> {

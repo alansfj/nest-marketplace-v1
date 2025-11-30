@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { Transactional } from 'typeorm-transactional';
 
-import { User } from '../../entities/user.entity';
+import { User, UserSelectableColumns } from '../../entities/user.entity';
 import { RegisterDtoInput } from '../auth/dtos/register/register.dto.input';
 import { ConfigService } from '@nestjs/config';
 import { IUserRepository } from 'src/types/user/user.repository.interface';
@@ -19,8 +19,11 @@ export class UserService implements IUserService {
 
   // methods without logic
 
-  async findOneById(id: number): Promise<User | null> {
-    return await this.userRepository.findOneById(id);
+  async findOneById(
+    id: number,
+    select?: UserSelectableColumns[],
+  ): Promise<User | null> {
+    return await this.userRepository.findOneById(id, select);
   }
 
   async findOneByEmail(email: string): Promise<User | null> {
