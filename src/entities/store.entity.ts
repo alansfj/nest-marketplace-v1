@@ -19,6 +19,7 @@ import { Category } from './category.entity';
 import { nonEmptyStringSchema } from 'src/common/schemas/not-empty-string.schema';
 import { NewEntityResult } from 'src/types/create-entity-result.type';
 import { validateNewEntity } from 'src/common/utils/validate-new-entity';
+import { SelectableColumns } from 'src/types/selectable-columns.type';
 
 const newEntitySchema = z.object({
   name: nonEmptyStringSchema(),
@@ -32,6 +33,11 @@ const newEntitySchema = z.object({
 });
 
 type newEntityDto = Required<z.infer<typeof newEntitySchema>>;
+
+export type StoreSelectableColumns = Exclude<
+  SelectableColumns<Store>,
+  '__brand'
+>;
 
 @Entity('stores')
 export class Store {

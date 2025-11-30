@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
 import { User, UserSelectableColumns } from 'src/entities/user.entity';
 import { IUserRepository } from 'src/types/user/user.repository.interface';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserTypeormRepository implements IUserRepository {

@@ -15,6 +15,7 @@ import { User } from './user.entity';
 import { Currency } from '../types/currency.type';
 import { NewEntityResult } from 'src/types/create-entity-result.type';
 import { validateNewEntity } from 'src/common/utils/validate-new-entity';
+import { SelectableColumns } from 'src/types/selectable-columns.type';
 
 const newEntitySchema = z.object({
   user: z.object({
@@ -25,6 +26,11 @@ const newEntitySchema = z.object({
 });
 
 type newEntityDto = Required<z.infer<typeof newEntitySchema>>;
+
+export type UserBalanceSelectableColumns = Exclude<
+  SelectableColumns<UserBalance>,
+  '__brand'
+>;
 
 @Entity('user_balance')
 export class UserBalance {
