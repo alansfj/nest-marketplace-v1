@@ -77,6 +77,6 @@ export class Store {
 
     if (newEntityError) return newEntityError;
 
-    return { value: new Store(dto), error: null };
+    return { value: new Store(dto), errors: null };
   }
 }

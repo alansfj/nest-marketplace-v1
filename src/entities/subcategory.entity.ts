@@ -53,6 +53,6 @@ export class Subcategory {
 
     if (newEntityError) return newEntityError;
 
-    return { value: new Subcategory(dto), error: null };
+    return { value: new Subcategory(dto), errors: null };
   }
 }

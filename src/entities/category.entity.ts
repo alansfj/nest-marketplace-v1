@@ -50,6 +50,6 @@ export class Category {
 
     if (newEntityError) return newEntityError;
 
-    return { value: new Category(dto), error: null };
+    return { value: new Category(dto), errors: null };
   }
 }

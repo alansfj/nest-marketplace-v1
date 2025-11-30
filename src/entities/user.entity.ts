@@ -77,6 +77,6 @@ export class User {
 
     if (newEntityError) return newEntityError;
 
-    return { value: new User(dto), error: null };
+    return { value: new User(dto), errors: null };
   }
 }

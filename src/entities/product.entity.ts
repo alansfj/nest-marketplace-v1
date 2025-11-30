@@ -104,6 +104,6 @@ export class Product {
 
     if (newEntityError) return newEntityError;
 
-    return { value: new Product(dto), error: null };
+    return { value: new Product(dto), errors: null };
   }
 }

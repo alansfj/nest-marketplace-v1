@@ -74,6 +74,6 @@ export class UserBalance {
 
     if (newEntityError) return newEntityError;
 
-    return { value: new UserBalance(dto), error: null };
+    return { value: new UserBalance(dto), errors: null };
   }
 }

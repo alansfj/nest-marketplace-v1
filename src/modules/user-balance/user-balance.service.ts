@@ -16,8 +16,8 @@ export class UserBalanceService implements IUserBalanceService {
       currency: Currency.MXN,
     });
 
-    if (newUserBalanceEntity.error) {
-      throw new BadRequestException(newUserBalanceEntity.error);
+    if (newUserBalanceEntity.errors) {
+      throw new BadRequestException(newUserBalanceEntity.errors);
     }
 
     return await this.userBalanceRepository.save(newUserBalanceEntity.value);
