@@ -11,15 +11,17 @@ export class UserTypeormRepository implements IUserRepository {
     private repo: Repository<User>,
   ) {}
 
-  private qb(alias = 'user') {
-    return this.repo.createQueryBuilder(alias);
+  private readonly TABLE_ALIAS = 'user';
+
+  private qb() {
+    return this.repo.createQueryBuilder(this.TABLE_ALIAS);
   }
 
-  private qbSelectedColumns(select?: UserSelectableColumns[], alias = 'user') {
-    const qb = this.qb(alias);
+  private qbSelectedColumns(select?: UserSelectableColumns[]) {
+    const qb = this.qb();
 
     if (select?.length) {
-      qb.select(select.map((col) => `${alias}.${col}`));
+      qb.select(select.map((col) => `${this.TABLE_ALIAS}.${col}`));
     }
 
     return qb;
@@ -35,7 +37,7 @@ export class UserTypeormRepository implements IUserRepository {
   ): Promise<Pick<User, T> | null> {
     const qb = this.qbSelectedColumns(select);
 
-    return await qb.where('user.id = :id', { id }).getOne();
+    return await qb.where(`${this.TABLE_ALIAS}.id = :id`, { id }).getOne();
   }
 
   async findOneByEmail<T extends UserSelectableColumns>(
@@ -44,14 +46,16 @@ export class UserTypeormRepository implements IUserRepository {
   ): Promise<Pick<User, T> | null> {
     const qb = this.qbSelectedColumns(select);
 
-    return await qb.where('user.email = :email', { email }).getOne();
+    return await qb
+      .where(`${this.TABLE_ALIAS}.email = :email`, { email })
+      .getOne();
   }
 
   async findOneBy(options: Partial<User>): Promise<User | null> {
     const qb = this.qb();
 
     Object.entries(options).forEach(([key, value]) => {
-      qb.andWhere(`user.${key} = :${key}`, { [key]: value });
+      qb.andWhere(`${this.TABLE_ALIAS}.${key} = :${key}`, { [key]: value });
     });
 
     return await qb.getOne();
