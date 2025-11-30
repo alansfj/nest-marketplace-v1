@@ -15,6 +15,16 @@ export class UserTypeormRepository implements IUserRepository {
     return this.repo.createQueryBuilder(alias);
   }
 
+  private qbSelectedColumns(select?: UserSelectableColumns[], alias = 'user') {
+    const qb = this.qb(alias);
+
+    if (select?.length) {
+      qb.select(select.map((col) => `${alias}.${col}`));
+    }
+
+    return qb;
+  }
+
   async save(user: User): Promise<User> {
     return await this.repo.save(user);
   }
@@ -23,11 +33,7 @@ export class UserTypeormRepository implements IUserRepository {
     id: number,
     select?: T[],
   ): Promise<Pick<User, T> | null> {
-    const qb = this.qb();
-
-    if (select?.length) {
-      qb.select(select.map((col) => `user.${col}`));
-    }
+    const qb = this.qbSelectedColumns(select);
 
     return await qb.where('user.id = :id', { id }).getOne();
   }
@@ -36,11 +42,7 @@ export class UserTypeormRepository implements IUserRepository {
     email: string,
     select?: T[],
   ): Promise<Pick<User, T> | null> {
-    const qb = this.qb();
-
-    if (select?.length) {
-      qb.select(select.map((col) => `user.${col}`));
-    }
+    const qb = this.qbSelectedColumns(select);
 
     return await qb.where('user.email = :email', { email }).getOne();
   }
