@@ -20,6 +20,8 @@ export const dataSourceOptions: DataSourceOptions = {
   entities: [User, Store, Product, Category, Subcategory, UserBalance],
   migrations: [__dirname + '/../migrations/*{.ts,.js}'],
   migrationsTableName: 'migrations',
+  logging: false,
+  logger: 'advanced-console',
 };
 
 const AppDataSource = new DataSource(dataSourceOptions);
