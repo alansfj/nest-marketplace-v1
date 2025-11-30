@@ -1,3 +1,5 @@
+import { z } from 'zod';
+import { Exclude } from 'class-transformer';
 import {
   Column,
   CreateDateColumn,
@@ -7,15 +9,45 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
 import { Store } from './store.entity';
 import { Subcategory } from './subcategory.entity';
 import { User } from './user.entity';
 import { Currency } from '../types/currency.type';
+import { nonEmptyStringSchema } from 'src/common/schemas/not-empty-string.schema';
+import { NewEntityResult } from 'src/types/create-entity-result.type';
+import { validateNewEntity } from 'src/common/utils/validate-new-entity';
+
+const newEntitySchema = z.object({
+  name: nonEmptyStringSchema(),
+  description: nonEmptyStringSchema(),
+  store: z.object({
+    __brand: z.literal('Store'),
+  }),
+  user: z.object({
+    __brand: z.literal('User'),
+  }),
+  subcategory: z.object({
+    __brand: z.literal('Subcategory'),
+  }),
+  price: z.number().gt(0),
+  currency: z.nativeEnum(Currency),
+  quantity: z.number().int().gt(0),
+});
+
+type newEntityDto = Required<z.infer<typeof newEntitySchema>>;
 
 @Entity('products')
 export class Product {
+  @Exclude()
+  readonly __brand = 'Product';
+
+  private constructor(dto: newEntityDto) {
+    Object.assign(this, dto);
+  }
+
   @PrimaryGeneratedColumn()
-  id: number;
+  readonly id: number;
 
   @Column({ length: 150, nullable: false })
   name: string;
@@ -57,11 +89,21 @@ export class Product {
   user: Partial<User>;
 
   @CreateDateColumn()
-  createdDate: Date;
+  readonly createdDate: Date;
 
   @UpdateDateColumn()
-  updatedDate: Date;
+  readonly updatedDate: Date;
 
   @DeleteDateColumn()
-  deletedDate: Date;
+  readonly deletedDate: Date;
+
+  // methods
+
+  static create(dto: newEntityDto): NewEntityResult<Product> {
+    const newEntityError = validateNewEntity(newEntitySchema, dto);
+
+    if (newEntityError) return newEntityError;
+
+    return { value: new Product(dto), error: null };
+  }
 }

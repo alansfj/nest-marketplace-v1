@@ -1,3 +1,5 @@
+import { z } from 'zod';
+import { Exclude } from 'class-transformer';
 import {
   Column,
   Entity,
@@ -5,13 +7,33 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+
 import { Category } from './category.entity';
 import { Product } from './product.entity';
+import { nonEmptyStringSchema } from 'src/common/schemas/not-empty-string.schema';
+import { NewEntityResult } from 'src/types/create-entity-result.type';
+import { validateNewEntity } from 'src/common/utils/validate-new-entity';
+
+const newEntitySchema = z.object({
+  category: z.object({
+    __brand: z.literal('Category'),
+  }),
+  name: nonEmptyStringSchema(),
+});
+
+type newEntityDto = Required<z.infer<typeof newEntitySchema>>;
 
 @Entity('subcategories')
 export class Subcategory {
+  @Exclude()
+  readonly __brand = 'Subcategory';
+
+  private constructor(dto: newEntityDto) {
+    Object.assign(this, dto);
+  }
+
   @PrimaryGeneratedColumn()
-  id: number;
+  readonly id: number;
 
   @Column({ unique: true, length: 50 })
   name: string;
@@ -23,4 +45,14 @@ export class Subcategory {
 
   @OneToMany(() => Product, (product) => product.subcategory)
   products: Product[];
+
+  // methods
+
+  static create(dto: newEntityDto): NewEntityResult<Subcategory> {
+    const newEntityError = validateNewEntity(newEntitySchema, dto);
+
+    if (newEntityError) return newEntityError;
+
+    return { value: new Subcategory(dto), error: null };
+  }
 }

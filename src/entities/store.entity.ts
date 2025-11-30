@@ -1,3 +1,5 @@
+import { z } from 'zod';
+import { Exclude } from 'class-transformer';
 import {
   Entity,
   Column,
@@ -10,14 +12,38 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
+
 import { User } from './user.entity';
 import { Product } from './product.entity';
 import { Category } from './category.entity';
+import { nonEmptyStringSchema } from 'src/common/schemas/not-empty-string.schema';
+import { NewEntityResult } from 'src/types/create-entity-result.type';
+import { validateNewEntity } from 'src/common/utils/validate-new-entity';
+
+const newEntitySchema = z.object({
+  name: nonEmptyStringSchema(),
+  description: nonEmptyStringSchema(),
+  user: z.object({
+    __brand: z.literal('User'),
+  }),
+  category: z.object({
+    __brand: z.literal('Category'),
+  }),
+});
+
+type newEntityDto = Required<z.infer<typeof newEntitySchema>>;
 
 @Entity('stores')
 export class Store {
+  @Exclude()
+  readonly __brand = 'Store';
+
+  private constructor(dto: newEntityDto) {
+    Object.assign(this, dto);
+  }
+
   @PrimaryGeneratedColumn()
-  id: number;
+  readonly id: number;
 
   @Column({ unique: true, length: 100 })
   name: string;
@@ -36,11 +62,21 @@ export class Store {
   categories: Category[];
 
   @CreateDateColumn()
-  createdDate: Date;
+  readonly createdDate: Date;
 
   @UpdateDateColumn()
-  updatedDate: Date;
+  readonly updatedDate: Date;
 
   @DeleteDateColumn()
-  deletedDate: Date;
+  readonly deletedDate: Date;
+
+  // methods
+
+  static create(dto: newEntityDto): NewEntityResult<Store> {
+    const newEntityError = validateNewEntity(newEntitySchema, dto);
+
+    if (newEntityError) return newEntityError;
+
+    return { value: new Store(dto), error: null };
+  }
 }

@@ -1,3 +1,5 @@
+import { z } from 'zod';
+import { Exclude } from 'class-transformer';
 import {
   Column,
   Entity,
@@ -5,13 +7,30 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+
 import { Subcategory } from './subcategory.entity';
 import { Store } from './store.entity';
+import { nonEmptyStringSchema } from 'src/common/schemas/not-empty-string.schema';
+import { NewEntityResult } from 'src/types/create-entity-result.type';
+import { validateNewEntity } from 'src/common/utils/validate-new-entity';
+
+const newEntitySchema = z.object({
+  name: nonEmptyStringSchema(),
+});
+
+type newEntityDto = Required<z.infer<typeof newEntitySchema>>;
 
 @Entity('categories')
 export class Category {
+  @Exclude()
+  readonly __brand = 'Category';
+
+  private constructor(dto: newEntityDto) {
+    Object.assign(this, dto);
+  }
+
   @PrimaryGeneratedColumn()
-  id: number;
+  readonly id: number;
 
   @Column({ unique: true, length: 50 })
   name: string;
@@ -23,4 +42,14 @@ export class Category {
 
   @ManyToMany(() => Store, (store) => store.categories)
   stores: Store[];
+
+  // methods
+
+  static create(dto: newEntityDto): NewEntityResult<Category> {
+    const newEntityError = validateNewEntity(newEntitySchema, dto);
+
+    if (newEntityError) return newEntityError;
+
+    return { value: new Category(dto), error: null };
+  }
 }
