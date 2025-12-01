@@ -31,7 +31,7 @@ export class UserBalanceTypeormRepository implements IUserBalanceRepository {
     return qb;
   }
 
-  async save(userBalance: UserBalance): Promise<UserBalance> {
+  save: IUserBalanceRepository['save'] = async (userBalance) => {
     return await this.repo.save(userBalance);
-  }
+  };
 }

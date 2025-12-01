@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 
 import { User, UserSelectableColumns } from 'src/entities/user.entity';
 import { IUserRepository } from 'src/types/user/user.repository.interface';
-import { PrimitiveColumns } from 'src/types/selectable-columns.type';
 
 @Injectable()
 export class UserTypeormRepository implements IUserRepository {
@@ -29,34 +28,31 @@ export class UserTypeormRepository implements IUserRepository {
     return qb;
   }
 
-  async save(user: User): Promise<User> {
+  save: IUserRepository['save'] = async (user) => {
     return await this.repo.save(user);
-  }
+  };
 
-  async findOneById<T extends UserSelectableColumns>(
-    id: number,
-    select?: T[],
-  ): Promise<Pick<User, T> | null> {
+  findOneById: IUserRepository['findOneById'] = async (id, select?) => {
     const qb = this.qbSelectedColumns(select);
 
-    return await qb.where(`${this.TABLE_ALIAS}.id = :id`, { id }).getOne();
-  }
+    return qb.where(`${this.TABLE_ALIAS}.id = :id`, { id }).getOne();
+  };
 
-  async findOneByEmail<T extends UserSelectableColumns>(
-    email: string,
-    select?: T[],
-  ): Promise<Pick<User, T> | null> {
+  findOneByEmail: IUserRepository['findOneByEmail'] = async (
+    email,
+    select?,
+  ) => {
     const qb = this.qbSelectedColumns(select);
 
     return await qb
       .where(`${this.TABLE_ALIAS}.email = :email`, { email })
       .getOne();
-  }
+  };
 
-  async findOneEqualBy<T extends UserSelectableColumns>(
-    options: Partial<Record<UserSelectableColumns, PrimitiveColumns>>,
-    select?: T[],
-  ): Promise<Pick<User, T> | null> {
+  findOneEqualBy: IUserRepository['findOneEqualBy'] = async (
+    options,
+    select?,
+  ) => {
     const qb = this.qbSelectedColumns(select);
 
     Object.entries(options).forEach(([key, value]) => {
@@ -64,5 +60,5 @@ export class UserTypeormRepository implements IUserRepository {
     });
 
     return await qb.getOne();
-  }
+  };
 }
