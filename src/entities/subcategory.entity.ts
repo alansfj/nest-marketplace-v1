@@ -24,10 +24,7 @@ const newEntitySchema = z.object({
 
 type newEntityDto = Required<z.infer<typeof newEntitySchema>>;
 
-export type SubcategorySelectableColumns = Exclude<
-  SelectableColumns<Subcategory>,
-  '__brand'
->;
+export type SubcategorySelectableColumns = SelectableColumns<Subcategory>;
 
 @Entity('subcategories')
 export class Subcategory {

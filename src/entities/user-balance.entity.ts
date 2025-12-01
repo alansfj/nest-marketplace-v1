@@ -27,10 +27,7 @@ const newEntitySchema = z.object({
 
 type newEntityDto = Required<z.infer<typeof newEntitySchema>>;
 
-export type UserBalanceSelectableColumns = Exclude<
-  SelectableColumns<UserBalance>,
-  '__brand'
->;
+export type UserBalanceSelectableColumns = SelectableColumns<UserBalance>;
 
 @Entity('user_balance')
 export class UserBalance {
