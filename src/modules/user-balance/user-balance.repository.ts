@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import {
+  TABLE_ALIAS_USER_BALANCE,
   UserBalance,
   UserBalanceSelectableColumns,
 } from 'src/entities/user-balance.entity';
@@ -15,17 +16,15 @@ export class UserBalanceTypeormRepository implements IUserBalanceRepository {
     private repo: Repository<UserBalance>,
   ) {}
 
-  private readonly TABLE_ALIAS = 'USER_BALANCE';
-
   private qb() {
-    return this.repo.createQueryBuilder(this.TABLE_ALIAS);
+    return this.repo.createQueryBuilder(TABLE_ALIAS_USER_BALANCE);
   }
 
   private qbSelectedColumns(select?: UserBalanceSelectableColumns[]) {
     const qb = this.qb();
 
     if (select?.length) {
-      qb.select(select.map((col) => `${this.TABLE_ALIAS}.${col}`));
+      qb.select(select.map((col) => `${TABLE_ALIAS_USER_BALANCE}.${col}`));
     }
 
     return qb;

@@ -26,7 +26,12 @@ type newEntityDto = Required<z.infer<typeof newEntitySchema>>;
 
 export type SubcategorySelectableColumns = SelectableColumns<Subcategory>;
 
-@Entity('subcategories')
+export const TABLE_NAME_SUBCATEGORY = 'subcategories';
+
+export const TABLE_ALIAS_SUBCATEGORY: Uppercase<typeof TABLE_NAME_SUBCATEGORY> =
+  'SUBCATEGORIES';
+
+@Entity(TABLE_NAME_SUBCATEGORY)
 export class Subcategory {
   @Exclude()
   readonly __brand = 'Subcategory';

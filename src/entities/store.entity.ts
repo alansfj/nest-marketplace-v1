@@ -36,7 +36,11 @@ type newEntityDto = Required<z.infer<typeof newEntitySchema>>;
 
 export type StoreSelectableColumns = SelectableColumns<Store>;
 
-@Entity('stores')
+export const TABLE_NAME_STORE = 'stores';
+
+export const TABLE_ALIAS_STORE: Uppercase<typeof TABLE_NAME_STORE> = 'STORES';
+
+@Entity(TABLE_NAME_STORE)
 export class Store {
   @Exclude()
   readonly __brand = 'Store';

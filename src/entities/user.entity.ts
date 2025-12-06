@@ -30,7 +30,11 @@ type newEntityDto = Required<z.infer<typeof newEntitySchema>>;
 
 export type UserSelectableColumns = SelectableColumns<User>;
 
-@Entity('users')
+export const TABLE_NAME_USER = 'users';
+
+export const TABLE_ALIAS_USER: Uppercase<typeof TABLE_NAME_USER> = 'USERS';
+
+@Entity(TABLE_NAME_USER)
 export class User {
   @Exclude()
   readonly __brand = 'User';
