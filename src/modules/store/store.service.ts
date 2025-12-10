@@ -20,40 +20,37 @@ export class StoreService implements IStoreService {
 
   @Transactional()
   async createStore(userId: number, dto: CreateStoreDtoInput): Promise<Store> {
-    const user = await this.userService.findOneById(userId, [
+    const userEntity = await this.userService.findOneById(userId, [
       'id',
       'email',
       'firstName',
       'lastName',
     ]);
 
-    if (!user) {
+    if (!userEntity) {
       throw new BadRequestException('User not found');
     }
 
-    const validCategories = await this.categoryService.validateCategoriesExist(
-      dto.categories,
-      ['id', 'name'],
-    );
+    const validCategoriesEntities =
+      await this.categoryService.validateCategoriesExist(dto.categories, [
+        'id',
+        'name',
+      ]);
 
-    if (!validCategories) {
+    if (!validCategoriesEntities) {
       throw new BadRequestException('Some categories are invalid');
     }
 
     const newStoreEntity = Store.create({
       name: dto.name,
       description: dto.description,
-      user: user as User,
-      categories: validCategories as Category[],
+      user: userEntity as User,
+      categories: validCategoriesEntities as Category[],
     });
 
-    if (newStoreEntity.errors) {
-      throw new BadRequestException(newStoreEntity.errors);
-    }
+    newStoreEntity.user = userEntity as User;
+    newStoreEntity.categories = validCategoriesEntities as Category[];
 
-    newStoreEntity.value.user = user as User;
-    newStoreEntity.value.categories = validCategories as Category[];
-
-    return await this.storeRepository.save(newStoreEntity.value);
+    return await this.storeRepository.save(newStoreEntity);
   }
 }

@@ -15,7 +15,6 @@ import { Store } from './store.entity';
 import { Product } from './product.entity';
 import { UserBalance } from './user-balance.entity';
 import { nonEmptyStringSchema } from '../common/schemas/not-empty-string.schema';
-import { NewEntityResult } from '../types/create-entity-result.type';
 import { validateNewEntity } from 'src/common/utils/validate-new-entity';
 import { SelectableColumns } from 'src/types/selectable-columns.type';
 
@@ -79,11 +78,9 @@ export class User {
 
   // methods
 
-  static create(dto: newEntityDto): NewEntityResult<User> {
-    const newEntityError = validateNewEntity(newEntitySchema, dto);
+  static create(dto: newEntityDto): User {
+    validateNewEntity('User', newEntitySchema, dto);
 
-    if (newEntityError) return newEntityError;
-
-    return { value: new User(dto), errors: null };
+    return new User(dto);
   }
 }

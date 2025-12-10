@@ -13,7 +13,6 @@ import {
 
 import { User } from './user.entity';
 import { Currency } from '../types/currency.type';
-import { NewEntityResult } from 'src/types/create-entity-result.type';
 import { validateNewEntity } from 'src/common/utils/validate-new-entity';
 import { SelectableColumns } from 'src/types/selectable-columns.type';
 
@@ -79,11 +78,9 @@ export class UserBalance {
 
   // methods
 
-  static create(dto: newEntityDto): NewEntityResult<UserBalance> {
-    const newEntityError = validateNewEntity(newEntitySchema, dto);
+  static create(dto: newEntityDto): UserBalance {
+    validateNewEntity('UserBalance', newEntitySchema, dto);
 
-    if (newEntityError) return newEntityError;
-
-    return { value: new UserBalance(dto), errors: null };
+    return new UserBalance(dto);
   }
 }

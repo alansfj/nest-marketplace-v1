@@ -1,18 +1,19 @@
 import { z, ZodSchema } from 'zod';
 
-import { NewEntityError } from 'src/types/create-entity-result.type';
+import { EntityValidationException } from '../exceptions/entity-validation.exception';
 
 export function validateNewEntity<S extends ZodSchema<any>>(
+  entityName: string,
   schema: S,
   dto: Required<z.infer<S>>,
-): NewEntityError | null {
+): void {
   const result = schema.safeParse(dto);
 
-  if (result.success) return null;
+  if (result.success) return;
 
   const message = result.error.errors.map(
     (e) => `${e.path.join('.')}: ${e.message}`,
   );
 
-  return { value: null, errors: message };
+  throw new EntityValidationException(entityName, message);
 }

@@ -11,7 +11,6 @@ import {
 import { Subcategory } from './subcategory.entity';
 import { Store } from './store.entity';
 import { nonEmptyStringSchema } from 'src/common/schemas/not-empty-string.schema';
-import { NewEntityResult } from 'src/types/create-entity-result.type';
 import { validateNewEntity } from 'src/common/utils/validate-new-entity';
 import { SelectableColumns } from 'src/types/selectable-columns.type';
 
@@ -53,11 +52,9 @@ export class Category {
 
   // methods
 
-  static create(dto: newEntityDto): NewEntityResult<Category> {
-    const newEntityError = validateNewEntity(newEntitySchema, dto);
+  static create(dto: newEntityDto): Category {
+    validateNewEntity('Category', newEntitySchema, dto);
 
-    if (newEntityError) return newEntityError;
-
-    return { value: new Category(dto), errors: null };
+    return new Category(dto);
   }
 }
