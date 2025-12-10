@@ -18,6 +18,7 @@ import { SelectableColumns } from 'src/types/selectable-columns.type';
 const newEntitySchema = z.object({
   category: z.object({
     __brand: z.literal('Category'),
+    id: z.number().int().positive(),
   }),
   name: nonEmptyStringSchema(),
 });

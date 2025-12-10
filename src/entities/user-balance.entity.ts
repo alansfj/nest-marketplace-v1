@@ -20,6 +20,7 @@ import { SelectableColumns } from 'src/types/selectable-columns.type';
 const newEntitySchema = z.object({
   user: z.object({
     __brand: z.literal('User'),
+    id: z.number().int().positive(),
   }),
   balance: z.number().gte(0),
   currency: z.nativeEnum(Currency),

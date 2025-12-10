@@ -24,12 +24,15 @@ const newEntitySchema = z.object({
   description: nonEmptyStringSchema(),
   store: z.object({
     __brand: z.literal('Store'),
+    id: z.number().int().positive(),
   }),
   user: z.object({
     __brand: z.literal('User'),
+    id: z.number().int().positive(),
   }),
   subcategory: z.object({
     __brand: z.literal('Subcategory'),
+    id: z.number().int().positive(),
   }),
   price: z.number().gt(0),
   currency: z.nativeEnum(Currency),
