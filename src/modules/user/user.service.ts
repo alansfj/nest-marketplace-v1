@@ -55,11 +55,7 @@ export class UserService implements IUserService {
       password: hashedPassword,
     });
 
-    if (newUserEntity.errors) {
-      throw new BadRequestException(newUserEntity.errors);
-    }
-
-    const newUser = await this.userRepository.save(newUserEntity.value);
+    const newUser = await this.userRepository.save(newUserEntity);
 
     await this.userBalanceService.createForNewUser(newUser);
 

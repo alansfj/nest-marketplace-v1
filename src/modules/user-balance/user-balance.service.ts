@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UserBalance } from 'src/entities/user-balance.entity';
 import { User } from 'src/entities/user.entity';
 import { Currency } from 'src/types/currency.type';
@@ -16,10 +16,6 @@ export class UserBalanceService implements IUserBalanceService {
       currency: Currency.MXN,
     });
 
-    if (newUserBalanceEntity.errors) {
-      throw new BadRequestException(newUserBalanceEntity.errors);
-    }
-
-    return await this.userBalanceRepository.save(newUserBalanceEntity.value);
+    return await this.userBalanceRepository.save(newUserBalanceEntity);
   }
 }
