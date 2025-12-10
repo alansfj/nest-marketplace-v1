@@ -11,6 +11,8 @@ import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { validate } from 'src/common/utils/env-validation';
 import { dataSourceOptions } from './data-source';
 import { UserBalanceModule } from './modules/user-balance/user-balance.module';
+import { StoreModule } from './modules/store/store.module';
+import { CategoryModules } from './modules/category/category.module';
 
 @Module({
   imports: [
@@ -32,6 +34,8 @@ import { UserBalanceModule } from './modules/user-balance/user-balance.module';
     UserModule,
     AuthModule,
     UserBalanceModule,
+    StoreModule,
+    CategoryModules,
   ],
   providers: [
     {

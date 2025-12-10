@@ -26,10 +26,14 @@ const newEntitySchema = z.object({
   description: nonEmptyStringSchema(),
   user: z.object({
     __brand: z.literal('User'),
+    id: z.number().int().positive(),
   }),
-  category: z.object({
-    __brand: z.literal('Category'),
-  }),
+  categories: z.array(
+    z.object({
+      __brand: z.literal('Category'),
+      id: z.number().int().positive(),
+    }),
+  ),
 });
 
 type newEntityDto = Required<z.infer<typeof newEntitySchema>>;
