@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   Post,
-  Request,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -16,6 +15,7 @@ import { createUserSchema } from 'src/common/schemas/create-user.schema';
 import { RegisterDtoInput } from 'src/modules/auth/dtos/register/register.dto.input';
 import { DtoOutputInterceptor } from 'src/common/interceptors/dto-output.interceptor';
 import { RegisterDtoOutput } from './dtos/register/register.dto.output';
+import { AuthUser } from 'src/common/decorators/user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -34,12 +34,12 @@ export class AuthController {
   @Post('login')
   @Public()
   @UseGuards(LocalAuthGuard)
-  async login(@Request() req) {
-    return this.authService.login(req.user);
+  async login(@AuthUser() user) {
+    return this.authService.login(user);
   }
 
   @Get('test')
-  test(@Request() req) {
-    return req.user;
+  test(@AuthUser() user) {
+    return user;
   }
 }

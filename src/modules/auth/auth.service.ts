@@ -4,7 +4,6 @@ import * as bcrypt from 'bcrypt';
 
 import { User } from 'src/entities/user.entity';
 import { RegisterDtoInput } from 'src/modules/auth/dtos/register/register.dto.input';
-import { AuthUser } from 'src/types/auth/auth-user.type';
 import { IUserService } from 'src/types/user/user.service.interface';
 
 @Injectable()
@@ -20,31 +19,23 @@ export class AuthService {
 
   async validateUser(
     email: string,
-    password: string,
-  ): Promise<AuthUser | null> {
-    const user = await this.userService.findOneByEmail(email, [
-      'id',
-      'password',
-      'email',
-      'firstName',
-      'lastName',
-    ]);
+    userPassword: string,
+  ): Promise<User | null> {
+    const user = await this.userService.findOneByEmail(email);
 
     if (!user) return null;
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(userPassword, user.password);
 
     if (!user || !isMatch) return null;
 
-    return {
-      id: user.id,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-    };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...rest } = user;
+
+    return rest as User;
   }
 
-  async login(user: any): Promise<{
+  async login(user: User): Promise<{
     access_token: string;
   }> {
     const payload = {
