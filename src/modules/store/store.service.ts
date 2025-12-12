@@ -31,12 +31,9 @@ export class StoreService implements IStoreService {
     const newStoreEntity = Store.create({
       name: dto.name,
       description: dto.description,
-      user: user,
+      user,
       categories: validCategoriesEntities as Category[],
     });
-
-    newStoreEntity.user = user;
-    newStoreEntity.categories = validCategoriesEntities as Category[];
 
     return await this.storeRepository.save(newStoreEntity);
   }
