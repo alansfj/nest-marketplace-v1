@@ -36,9 +36,6 @@ export class CreateStoreDtoOutput {
   description: string;
 
   @Expose()
-  lastName: string;
-
-  @Expose()
   createdDate: Date;
 
   @Expose()
