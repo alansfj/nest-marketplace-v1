@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-import { Category } from './category.entity';
+import { Category, ENTITY_NAME_CATEGORY } from './category.entity';
 import { Product } from './product.entity';
 import { nonEmptyStringSchema } from 'src/common/schemas/not-empty-string.schema';
 import { validateNewEntity } from 'src/common/utils/validate-new-entity';
@@ -16,7 +16,7 @@ import { SelectableColumns } from 'src/types/selectable-columns.type';
 
 const newEntitySchema = z.object({
   category: z.object({
-    __brand: z.literal('Category'),
+    __brand: z.literal(ENTITY_NAME_CATEGORY),
     id: z.number().int().positive(),
   }),
   name: nonEmptyStringSchema(),
@@ -31,10 +31,12 @@ export const TABLE_NAME_SUBCATEGORY = 'subcategories';
 export const TABLE_ALIAS_SUBCATEGORY: Uppercase<typeof TABLE_NAME_SUBCATEGORY> =
   'SUBCATEGORIES';
 
+export const ENTITY_NAME_SUBCATEGORY = 'Subcategory';
+
 @Entity(TABLE_NAME_SUBCATEGORY)
 export class Subcategory {
   @Exclude()
-  readonly __brand = 'Subcategory';
+  readonly __brand = ENTITY_NAME_SUBCATEGORY;
 
   private constructor(dto: newEntityDto) {
     Object.assign(this, dto);
@@ -57,7 +59,7 @@ export class Subcategory {
   // methods
 
   static create(dto: newEntityDto): Subcategory {
-    validateNewEntity('Subcategory', newEntitySchema, dto);
+    validateNewEntity(ENTITY_NAME_SUBCATEGORY, newEntitySchema, dto);
 
     return new Subcategory(dto);
   }

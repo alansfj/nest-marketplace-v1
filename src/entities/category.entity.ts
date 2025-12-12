@@ -27,10 +27,12 @@ export const TABLE_NAME_CATEGORY = 'categories';
 export const TABLE_ALIAS_CATEGORY: Uppercase<typeof TABLE_NAME_CATEGORY> =
   'CATEGORIES';
 
+export const ENTITY_NAME_CATEGORY = 'Category';
+
 @Entity(TABLE_NAME_CATEGORY)
 export class Category {
   @Exclude()
-  readonly __brand = 'Category';
+  readonly __brand = ENTITY_NAME_CATEGORY;
 
   private constructor(dto: newEntityDto) {
     Object.assign(this, dto);
@@ -53,7 +55,7 @@ export class Category {
   // methods
 
   static create(dto: newEntityDto): Category {
-    validateNewEntity('Category', newEntitySchema, dto);
+    validateNewEntity(ENTITY_NAME_CATEGORY, newEntitySchema, dto);
 
     return new Category(dto);
   }

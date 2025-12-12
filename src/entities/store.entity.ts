@@ -13,9 +13,9 @@ import {
   JoinTable,
 } from 'typeorm';
 
-import { User } from './user.entity';
+import { ENTITY_NAME_USER, User } from './user.entity';
 import { Product } from './product.entity';
-import { Category } from './category.entity';
+import { Category, ENTITY_NAME_CATEGORY } from './category.entity';
 import { nonEmptyStringSchema } from 'src/common/schemas/not-empty-string.schema';
 import { validateNewEntity } from 'src/common/utils/validate-new-entity';
 import { SelectableColumns } from 'src/types/selectable-columns.type';
@@ -24,12 +24,12 @@ const newEntitySchema = z.object({
   name: nonEmptyStringSchema(),
   description: nonEmptyStringSchema(),
   user: z.object({
-    __brand: z.literal('User'),
+    __brand: z.literal(ENTITY_NAME_USER),
     id: z.number().int().positive(),
   }),
   categories: z.array(
     z.object({
-      __brand: z.literal('Category'),
+      __brand: z.literal(ENTITY_NAME_CATEGORY),
       id: z.number().int().positive(),
     }),
   ),
@@ -43,10 +43,12 @@ export const TABLE_NAME_STORE = 'stores';
 
 export const TABLE_ALIAS_STORE: Uppercase<typeof TABLE_NAME_STORE> = 'STORES';
 
+export const ENTITY_NAME_STORE = 'Store';
+
 @Entity(TABLE_NAME_STORE)
 export class Store {
   @Exclude()
-  readonly __brand = 'Store';
+  readonly __brand = ENTITY_NAME_STORE;
 
   private constructor(dto: newEntityDto) {
     Object.assign(this, dto);
@@ -83,7 +85,7 @@ export class Store {
   // methods
 
   static create(dto: newEntityDto): Store {
-    validateNewEntity('Store', newEntitySchema, dto);
+    validateNewEntity(ENTITY_NAME_STORE, newEntitySchema, dto);
 
     return new Store(dto);
   }
