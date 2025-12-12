@@ -33,12 +33,10 @@ export const TABLE_NAME_USER = 'users';
 
 export const TABLE_ALIAS_USER: Uppercase<typeof TABLE_NAME_USER> = 'USERS';
 
-export const ENTITY_NAME_USER = 'User';
-
 @Entity(TABLE_NAME_USER)
 export class User {
   @Exclude()
-  readonly __brand = ENTITY_NAME_USER;
+  readonly __brand = 'User';
 
   private constructor(dto: newEntityDto) {
     Object.assign(this, dto);
@@ -81,7 +79,7 @@ export class User {
   // methods
 
   static create(dto: newEntityDto): User {
-    validateNewEntity(ENTITY_NAME_USER, newEntitySchema, dto);
+    validateNewEntity('User', newEntitySchema, dto);
 
     return new User(dto);
   }

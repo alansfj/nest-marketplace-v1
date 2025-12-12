@@ -10,9 +10,9 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { ENTITY_NAME_STORE, Store } from './store.entity';
-import { ENTITY_NAME_SUBCATEGORY, Subcategory } from './subcategory.entity';
-import { ENTITY_NAME_USER, User } from './user.entity';
+import { Store } from './store.entity';
+import { Subcategory } from './subcategory.entity';
+import { User } from './user.entity';
 import { Currency } from '../types/currency.type';
 import { nonEmptyStringSchema } from 'src/common/schemas/not-empty-string.schema';
 import { validateNewEntity } from 'src/common/utils/validate-new-entity';
@@ -22,15 +22,15 @@ const newEntitySchema = z.object({
   name: nonEmptyStringSchema(),
   description: nonEmptyStringSchema(),
   store: z.object({
-    __brand: z.literal(ENTITY_NAME_STORE),
+    __brand: z.literal('Store'),
     id: z.number().int().positive(),
   }),
   user: z.object({
-    __brand: z.literal(ENTITY_NAME_USER),
+    __brand: z.literal('User'),
     id: z.number().int().positive(),
   }),
   subcategory: z.object({
-    __brand: z.literal(ENTITY_NAME_SUBCATEGORY),
+    __brand: z.literal('Subcategory'),
     id: z.number().int().positive(),
   }),
   price: z.number().gt(0),
@@ -47,12 +47,10 @@ export const TABLE_NAME_PRODUCT = 'products';
 export const TABLE_ALIAS_PRODUCT: Uppercase<typeof TABLE_NAME_PRODUCT> =
   'PRODUCTS';
 
-export const ENTITY_NAME_PRODUCT = 'Product';
-
 @Entity(TABLE_NAME_PRODUCT)
 export class Product {
   @Exclude()
-  readonly __brand = ENTITY_NAME_PRODUCT;
+  readonly __brand = 'Product';
 
   private constructor(dto: newEntityDto) {
     Object.assign(this, dto);
@@ -112,7 +110,7 @@ export class Product {
   // methods
 
   static create(dto: newEntityDto): Product {
-    validateNewEntity(ENTITY_NAME_PRODUCT, newEntitySchema, dto);
+    validateNewEntity('Product', newEntitySchema, dto);
 
     return new Product(dto);
   }

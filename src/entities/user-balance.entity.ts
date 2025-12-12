@@ -11,14 +11,14 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { ENTITY_NAME_USER, User } from './user.entity';
+import { User } from './user.entity';
 import { Currency } from '../types/currency.type';
 import { validateNewEntity } from 'src/common/utils/validate-new-entity';
 import { SelectableColumns } from 'src/types/selectable-columns.type';
 
 const newEntitySchema = z.object({
   user: z.object({
-    __brand: z.literal(ENTITY_NAME_USER),
+    __brand: z.literal('User'),
     id: z.number().int().positive(),
   }),
   balance: z.number().gte(0),
@@ -35,12 +35,10 @@ export const TABLE_ALIAS_USER_BALANCE: Uppercase<
   typeof TABLE_NAME_USER_BALANCE
 > = 'USER_BALANCE';
 
-export const ENTITY_NAME_USER_BALANCE = 'UserBalance';
-
 @Entity(TABLE_NAME_USER_BALANCE)
 export class UserBalance {
   @Exclude()
-  readonly __brand = ENTITY_NAME_USER_BALANCE;
+  readonly __brand = 'UserBalance';
 
   private constructor(dto: newEntityDto) {
     Object.assign(this, dto);
@@ -81,7 +79,7 @@ export class UserBalance {
   // methods
 
   static create(dto: newEntityDto): UserBalance {
-    validateNewEntity(ENTITY_NAME_USER_BALANCE, newEntitySchema, dto);
+    validateNewEntity('UserBalance', newEntitySchema, dto);
 
     return new UserBalance(dto);
   }
