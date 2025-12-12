@@ -6,6 +6,10 @@ import {
 export abstract class ICategoryRepository {
   abstract save(user: Category): Promise<Category>;
 
+  abstract findAll<T extends CategorySelectableColumns>(
+    select?: T[],
+  ): Promise<Pick<Category, T>[] | []>;
+
   abstract findOneById<T extends CategorySelectableColumns>(
     id: number,
     select?: T[],

@@ -6,10 +6,11 @@ import { ICategoryService } from 'src/types/category/category.service.interface'
 import { CategoryService } from './category.service';
 import { ICategoryRepository } from 'src/types/category/category.repository.interface';
 import { CategoryTypeormRepository } from './category.repository';
+import { CategoryController } from './category.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Category])],
-  controllers: [],
+  controllers: [CategoryController],
   providers: [
     {
       provide: ICategoryService,

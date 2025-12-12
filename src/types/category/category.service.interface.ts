@@ -9,6 +9,10 @@ export abstract class ICategoryService {
     select?: T[],
   ): Promise<Pick<Category, T> | null>;
 
+  abstract findAll<T extends CategorySelectableColumns>(
+    select?: T[],
+  ): Promise<Pick<Category, T>[] | []>;
+
   abstract findManyByIds<T extends CategorySelectableColumns>(
     ids: number[],
     select?: T[],

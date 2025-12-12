@@ -33,6 +33,14 @@ export class CategoryTypeormRepository implements ICategoryRepository {
     return await this.repo.save(category);
   }
 
+  async findAll<T extends CategorySelectableColumns>(
+    select?: T[],
+  ): Promise<Pick<Category, T>[] | []> {
+    const qb = this.qbSelectedColumns(select);
+
+    return qb.getMany();
+  }
+
   async findOneById<T extends CategorySelectableColumns>(
     id: number,
     select?: T[],

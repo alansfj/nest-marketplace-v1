@@ -11,6 +11,12 @@ import { ICategoryService } from 'src/types/category/category.service.interface'
 export class CategoryService implements ICategoryService {
   constructor(private readonly categoryRepository: ICategoryRepository) {}
 
+  async findAll<T extends CategorySelectableColumns>(
+    select?: T[],
+  ): Promise<Pick<Category, T>[] | []> {
+    return await this.categoryRepository.findAll(select);
+  }
+
   async findOneById<T extends CategorySelectableColumns>(
     id: number,
     select?: T[],
