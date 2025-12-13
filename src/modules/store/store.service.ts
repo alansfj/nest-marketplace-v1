@@ -40,8 +40,14 @@ export class StoreService implements IStoreService {
 
   @Transactional()
   async validateStoreName(storeName: string): Promise<{ valid: boolean }> {
+    const storeNameNormalized = Store.normalizeName(storeName);
+
+    if (!storeNameNormalized) {
+      throw new BadRequestException('a valid name is required');
+    }
+
     const store = await this.storeRepository.findOneEqualBy(
-      { name: storeName },
+      { nameNormalized: storeNameNormalized },
       ['id'],
     );
 
