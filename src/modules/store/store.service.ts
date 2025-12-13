@@ -37,4 +37,16 @@ export class StoreService implements IStoreService {
 
     return await this.storeRepository.save(newStoreEntity);
   }
+
+  @Transactional()
+  async validateStoreName(storeName: string): Promise<{ valid: boolean }> {
+    const store = await this.storeRepository.findOneEqualBy(
+      { name: storeName },
+      ['id'],
+    );
+
+    if (store) return { valid: false };
+
+    return { valid: true };
+  }
 }

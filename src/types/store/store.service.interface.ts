@@ -4,4 +4,6 @@ import { CreateStoreDtoInput } from 'src/modules/store/dtos/create-store.dto.inp
 
 export abstract class IStoreService {
   abstract createStore(user: User, dto: CreateStoreDtoInput): Promise<Store>;
+
+  abstract validateStoreName(storeName: string): Promise<{ valid: boolean }>;
 }

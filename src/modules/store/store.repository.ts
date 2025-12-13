@@ -8,6 +8,7 @@ import {
   TABLE_ALIAS_STORE,
 } from 'src/entities/store.entity';
 import { IStoreRepository } from 'src/types/store/store.repository.interface';
+import { PrimitiveColumns } from 'src/types/selectable-columns.type';
 
 @Injectable()
 export class StoreTypeormRepository implements IStoreRepository {
@@ -32,5 +33,18 @@ export class StoreTypeormRepository implements IStoreRepository {
 
   async save(store: Store): Promise<Store> {
     return await this.repo.save(store);
+  }
+
+  async findOneEqualBy<T extends StoreSelectableColumns>(
+    options: Partial<Record<StoreSelectableColumns, PrimitiveColumns>>,
+    select?: T[],
+  ): Promise<Pick<Store, T> | null> {
+    const qb = this.qbSelectedColumns(select);
+
+    Object.entries(options).forEach(([key, value]) => {
+      qb.andWhere(`${TABLE_ALIAS_STORE}.${key} = :${key}`, { [key]: value });
+    });
+
+    return await qb.getOne();
   }
 }
