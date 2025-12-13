@@ -20,8 +20,6 @@ import { nonEmptyStringSchema } from 'src/common/schemas/not-empty-string.schema
 import { validateNewEntity } from 'src/common/utils/validate-new-entity';
 import { SelectableColumns } from 'src/types/selectable-columns.type';
 
-// console.log(ENTITY_NAME_USER);
-
 const newEntitySchema = z.object({
   name: nonEmptyStringSchema(),
   description: nonEmptyStringSchema(),
@@ -60,6 +58,9 @@ export class Store {
   @Column({ unique: true, length: 100 })
   name: string;
 
+  @Column({ unique: true, length: 100 })
+  nameNormalized: string;
+
   @Column({ type: 'text' })
   description: string;
 
@@ -87,6 +88,22 @@ export class Store {
   static create(dto: newEntityDto): Store {
     validateNewEntity('Store', newEntitySchema, dto);
 
-    return new Store(dto);
+    const store = new Store(dto);
+
+    store.nameNormalized = Store.normalizeName(store.name);
+
+    return store;
+  }
+
+  static normalizeName(name: string): string {
+    return name
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '');
   }
 }
