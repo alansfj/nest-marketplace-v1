@@ -32,7 +32,7 @@ npm run start:prod
 To generate migrations use the command
 
 ```bash
-npx typeorm-ts-node-commonjs migration:generate migrations/<migration-name> -d src/data-source.ts -p
+npm run migration:generate -- migrations/<migration-name>
 ```
 
 ## Create Empty Migrations
@@ -40,7 +40,7 @@ npx typeorm-ts-node-commonjs migration:generate migrations/<migration-name> -d s
 To create an empty migration use the command
 
 ```bash
-npx typeorm migration:create migrations/<migration-name>
+ npm run migration:create -- migrations/<migration-name>
 ```
 
 ## Run Migrations
@@ -48,5 +48,5 @@ npx typeorm migration:create migrations/<migration-name>
 To run pending migrations use the command 
 
 ```bash
-npx typeorm-ts-node-commonjs migration:run -d src/data-source.ts
+npm run migration:run
 ```
