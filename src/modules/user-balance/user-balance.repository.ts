@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 
 import {
   TABLE_ALIAS_USER_BALANCE,
@@ -20,12 +20,10 @@ export class UserBalanceTypeormRepository implements IUserBalanceRepository {
     return this.repo.createQueryBuilder(TABLE_ALIAS_USER_BALANCE);
   }
 
-  private qbSelectedColumns(select?: UserBalanceSelectableColumns[]) {
+  private qbSelectedColumns(select: UserBalanceSelectableColumns[]) {
     const qb = this.qb();
 
-    if (select?.length) {
-      qb.select(select.map((col) => `${TABLE_ALIAS_USER_BALANCE}.${col}`));
-    }
+    qb.select(select.map((col) => `${TABLE_ALIAS_USER_BALANCE}.${col}`));
 
     return qb;
   }
@@ -34,14 +32,24 @@ export class UserBalanceTypeormRepository implements IUserBalanceRepository {
     return await this.repo.save(userBalance);
   };
 
-  async findOneByUserId<T extends UserBalanceSelectableColumns>(
-    userId: number,
-    select?: T[],
-  ): Promise<Pick<UserBalance, T> | null> {
-    const qb = this.qbSelectedColumns(select);
-
+  private findOneByUserId(qb: SelectQueryBuilder<UserBalance>, userId: number) {
     return qb
       .where(`${TABLE_ALIAS_USER_BALANCE}.userId = :userId`, { userId })
       .getOne();
+  }
+
+  async findOneByUserIdReadOnly<T extends UserBalanceSelectableColumns>(
+    userId: number,
+    select: T[],
+  ): Promise<Pick<UserBalance, T> | null> {
+    const qb = this.qbSelectedColumns(select);
+
+    return this.findOneByUserId(qb, userId);
+  }
+
+  async findOneByUserIdForUpdate(userId: number): Promise<UserBalance | null> {
+    const qb = this.qb().setLock('pessimistic_write');
+
+    return this.findOneByUserId(qb, userId);
   }
 }

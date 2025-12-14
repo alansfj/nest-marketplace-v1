@@ -27,19 +27,15 @@ export class UserBalanceService implements IUserBalanceService {
     user: User,
     quantity: number,
   ): Promise<UserBalance> {
-    const userBalanceEntity = await this.userBalanceRepository.findOneByUserId(
-      user.id,
-      ['id', 'balance', 'currency'],
-    );
+    const userBalanceEntity =
+      await this.userBalanceRepository.findOneByUserIdForUpdate(user.id);
 
     if (!userBalanceEntity) {
       throw new BadRequestException('error getting user balance');
     }
 
-    (userBalanceEntity as UserBalance).increaseBalance(quantity);
+    userBalanceEntity.increaseBalance(quantity);
 
-    return await this.userBalanceRepository.save(
-      userBalanceEntity as UserBalance,
-    );
+    return await this.userBalanceRepository.save(userBalanceEntity);
   }
 }
