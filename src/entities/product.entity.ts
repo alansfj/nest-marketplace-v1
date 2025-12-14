@@ -17,6 +17,7 @@ import { Currency } from '../types/currency.type';
 import { nonEmptyStringSchema } from 'src/common/schemas/not-empty-string.schema';
 import { validateNewEntity } from 'src/common/utils/validate-new-entity';
 import { SelectableColumns } from 'src/types/selectable-columns.type';
+import { MONEY_SCALE } from 'src/common/constants/money-scale';
 
 const newEntitySchema = z.object({
   name: nonEmptyStringSchema(),
@@ -78,10 +79,10 @@ export class Product {
   @Column({
     type: 'numeric',
     precision: 11,
-    scale: 2,
+    scale: MONEY_SCALE,
     nullable: false,
   })
-  price: number;
+  price: string;
 
   @Column({
     type: 'enum',

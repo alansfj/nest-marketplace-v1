@@ -5,10 +5,11 @@ import { IUserBalanceService } from 'src/types/user-balance/user-balance.service
 import { UserBalanceService } from './user-balance.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserBalance } from 'src/entities/user-balance.entity';
+import { UserBalanceController } from './user-balance.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([UserBalance])],
-  controllers: [],
+  controllers: [UserBalanceController],
   providers: [
     {
       provide: IUserBalanceService,

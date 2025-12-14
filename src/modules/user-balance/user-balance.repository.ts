@@ -33,4 +33,15 @@ export class UserBalanceTypeormRepository implements IUserBalanceRepository {
   save: IUserBalanceRepository['save'] = async (userBalance) => {
     return await this.repo.save(userBalance);
   };
+
+  async findOneByUserId<T extends UserBalanceSelectableColumns>(
+    userId: number,
+    select?: T[],
+  ): Promise<Pick<UserBalance, T> | null> {
+    const qb = this.qbSelectedColumns(select);
+
+    return qb
+      .where(`${TABLE_ALIAS_USER_BALANCE}.userId = :userId`, { userId })
+      .getOne();
+  }
 }

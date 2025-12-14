@@ -1,0 +1,1 @@
+export const BALANCE_MAX_LIMIT = 100000000;

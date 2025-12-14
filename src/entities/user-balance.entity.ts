@@ -15,6 +15,8 @@ import { User } from './user.entity';
 import { Currency } from '../types/currency.type';
 import { validateNewEntity } from 'src/common/utils/validate-new-entity';
 import { SelectableColumns } from 'src/types/selectable-columns.type';
+import { MONEY_SCALE } from 'src/common/constants/money-scale';
+import { Money } from 'src/common/value-objects/money';
 
 const newEntitySchema = z.object({
   user: z.object({
@@ -54,11 +56,11 @@ export class UserBalance {
   @Column({
     type: 'numeric',
     precision: 11,
-    scale: 2,
+    scale: MONEY_SCALE,
     nullable: false,
     default: 0,
   })
-  balance: number;
+  balance: string;
 
   @Column({
     type: 'enum',
@@ -82,5 +84,17 @@ export class UserBalance {
     validateNewEntity('UserBalance', newEntitySchema, dto);
 
     return new UserBalance(dto);
+  }
+
+  increaseBalance(quantity: number | string): void {
+    const increment = Money.from(quantity);
+
+    if (increment.isNegative()) {
+      throw new Error('Cannot increase balance with negative amount');
+    }
+
+    const result = Money.from(this.balance).add(increment);
+
+    this.balance = result.toString();
   }
 }

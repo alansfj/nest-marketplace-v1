@@ -1,4 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { Transactional } from 'typeorm-transactional';
+
 import { UserBalance } from 'src/entities/user-balance.entity';
 import { User } from 'src/entities/user.entity';
 import { Currency } from 'src/types/currency.type';
@@ -9,6 +11,7 @@ import { IUserBalanceService } from 'src/types/user-balance/user-balance.service
 export class UserBalanceService implements IUserBalanceService {
   constructor(private readonly userBalanceRepository: IUserBalanceRepository) {}
 
+  @Transactional()
   async createForNewUser(user: User): Promise<UserBalance> {
     const newUserBalanceEntity = UserBalance.create({
       user,
@@ -17,5 +20,26 @@ export class UserBalanceService implements IUserBalanceService {
     });
 
     return await this.userBalanceRepository.save(newUserBalanceEntity);
+  }
+
+  @Transactional()
+  async increaseUserBalance(
+    user: User,
+    quantity: number,
+  ): Promise<UserBalance> {
+    const userBalanceEntity = await this.userBalanceRepository.findOneByUserId(
+      user.id,
+      ['id', 'balance', 'currency'],
+    );
+
+    if (!userBalanceEntity) {
+      throw new BadRequestException('error getting user balance');
+    }
+
+    (userBalanceEntity as UserBalance).increaseBalance(quantity);
+
+    return await this.userBalanceRepository.save(
+      userBalanceEntity as UserBalance,
+    );
   }
 }
