@@ -21,16 +21,16 @@ export class UserService implements IUserService {
 
   async findOneById<T extends UserSelectableColumns>(
     id: number,
-    select?: T[],
+    select: T[],
   ): Promise<Pick<User, T> | null> {
-    return await this.userRepository.findOneById(id, select);
+    return await this.userRepository.findOneByIdReadOnly(id, select);
   }
 
   async findOneByEmail<T extends UserSelectableColumns>(
     email: string,
-    select?: T[],
+    select: T[],
   ): Promise<Pick<User, T> | null> {
-    return await this.userRepository.findOneByEmail(email, select);
+    return await this.userRepository.findOneByEqualReadOnly({ email }, select);
   }
 
   // methods with logic
