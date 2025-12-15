@@ -1,57 +1,65 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
 import {
   Category,
   CategorySelectableColumns,
   TABLE_ALIAS_CATEGORY,
 } from 'src/entities/category.entity';
+import { BaseTypeormRepository } from 'src/common/repositories/base-typeorm.repository';
 import { ICategoryRepository } from 'src/types/category/category.repository.interface';
-import { Repository, SelectQueryBuilder } from 'typeorm';
 
 @Injectable()
-export class CategoryTypeormRepository implements ICategoryRepository {
+export class CategoryTypeormRepository
+  extends BaseTypeormRepository<Category, CategorySelectableColumns>
+  implements ICategoryRepository
+{
+  protected readonly alias = TABLE_ALIAS_CATEGORY;
+
   constructor(
     @InjectRepository(Category)
-    private readonly repo: Repository<Category>,
-  ) {}
-
-  private qb() {
-    return this.repo.createQueryBuilder(TABLE_ALIAS_CATEGORY);
+    repo: Repository<Category>,
+  ) {
+    super(repo);
   }
 
-  private qbSelectedColumns(select: CategorySelectableColumns[]) {
-    const qb = this.qb();
+  /* ============================
+   * WRITE / FOR UPDATE
+   * ============================ */
 
-    qb.select(select.map((col) => `${TABLE_ALIAS_CATEGORY}.${col}`));
-
-    return qb;
+  async findAllForUpdate(): Promise<Category[]> {
+    const qb = this.qb().setLock('pessimistic_write');
+    return this.findAll(qb);
   }
 
-  async save(category: Category): Promise<Category> {
-    return await this.repo.save(category);
+  async findOneByIdForUpdate(id: number): Promise<Category | null> {
+    const qb = this.qb().setLock('pessimistic_write');
+    return this.findOneById(qb, id);
   }
 
-  async findAll<T extends CategorySelectableColumns>(
+  async findManyByIdsForUpdate(ids: number[]): Promise<Category[]> {
+    const qb = this.qb().setLock('pessimistic_write');
+    return this.findManyByIds(qb, ids);
+  }
+
+  /* ============================
+   * READ ONLY
+   * ============================ */
+
+  async findAllReadOnly<T extends CategorySelectableColumns>(
     select: T[],
-  ): Promise<Pick<Category, T>[] | []> {
+  ): Promise<Pick<Category, T>[]> {
     const qb = this.qbSelectedColumns(select);
-
-    return qb.getMany();
+    return this.findAll(qb);
   }
 
-  async findOneById<T extends CategorySelectableColumns>(
+  async findOneByIdReadOnly<T extends CategorySelectableColumns>(
     id: number,
     select: T[],
   ): Promise<Pick<Category, T> | null> {
     const qb = this.qbSelectedColumns(select);
-
-    return qb.where(`${TABLE_ALIAS_CATEGORY}.id = :id`, { id }).getOne();
-  }
-
-  private findManyByIds(qb: SelectQueryBuilder<Category>, ids: number[]) {
-    return qb
-      .where(`${TABLE_ALIAS_CATEGORY}.id IN (:...ids)`, { ids })
-      .getMany();
+    return this.findOneById(qb, id);
   }
 
   async findManyByIdsReadOnly<T extends CategorySelectableColumns>(
@@ -59,13 +67,6 @@ export class CategoryTypeormRepository implements ICategoryRepository {
     select: T[],
   ): Promise<Pick<Category, T>[]> {
     const qb = this.qbSelectedColumns(select);
-
-    return this.findManyByIds(qb, ids);
-  }
-
-  async findManyByIdsForUpdate(ids: number[]): Promise<Category[]> {
-    const qb = this.qb().setLock('pessimistic_write');
-
     return this.findManyByIds(qb, ids);
   }
 }
