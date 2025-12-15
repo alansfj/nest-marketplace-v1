@@ -1,9 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { Transactional } from 'typeorm-transactional';
 
-import {
-  CategorySelectableColumns,
-  Category,
-} from 'src/entities/category.entity';
 import { ICategoryRepository } from 'src/types/category/category.repository.interface';
 import { ICategoryService } from 'src/types/category/category.service.interface';
 
@@ -11,71 +8,23 @@ import { ICategoryService } from 'src/types/category/category.service.interface'
 export class CategoryService implements ICategoryService {
   constructor(private readonly categoryRepository: ICategoryRepository) {}
 
-  // findAll
-
-  async findAllForUpdate(): Promise<Category[]> {
-    return await this.categoryRepository.findAllForUpdate();
+  async getCategoriesForStoreCreation() {
+    return await this.categoryRepository.findAllReadOnly(['id', 'name']);
   }
 
-  async findAllReadOnly<T extends CategorySelectableColumns>(
-    select: T[],
-  ): Promise<Pick<Category, T>[]> {
-    return await this.categoryRepository.findAllReadOnly(select);
-  }
+  @Transactional()
+  async validateCategoriesExistForStoreCreation(ids: number[]) {
+    if (!ids.length) {
+      throw new BadRequestException('Categories required');
+    }
 
-  // findOneById
+    const categories =
+      await this.categoryRepository.findManyByIdsForUpdate(ids);
 
-  async findOneByIdForUpdate(id: number): Promise<Category | null> {
-    return await this.categoryRepository.findOneByIdForUpdate(id);
-  }
+    if (ids.length !== categories.length) {
+      throw new BadRequestException('Some categories are invalid');
+    }
 
-  async findOneByIdReadOnly<T extends CategorySelectableColumns>(
-    id: number,
-    select: T[],
-  ): Promise<Pick<Category, T> | null> {
-    return await this.categoryRepository.findOneByIdReadOnly(id, select);
-  }
-
-  // findManyByIds
-
-  async findManyByIdsForUpdate(ids: number[]): Promise<Category[]> {
-    return await this.categoryRepository.findManyByIdsForUpdate(ids);
-  }
-
-  async findManyByIdsReadOnly<T extends CategorySelectableColumns>(
-    ids: number[],
-    select: T[],
-  ): Promise<Pick<Category, T>[]> {
-    return await this.categoryRepository.findManyByIdsReadOnly(ids, select);
-  }
-
-  // validateCategoriesExist
-
-  private async validateEntitiesExist<T>(
-    ids: number[],
-    finder: () => Promise<T[]>,
-  ): Promise<T[] | false> {
-    if (!ids.length) return false;
-
-    const entities = await finder();
-
-    return ids.length === entities.length ? entities : false;
-  }
-
-  async validateCategoriesExistForUpdate(
-    ids: number[],
-  ): Promise<Category[] | false> {
-    return this.validateEntitiesExist(ids, () =>
-      this.findManyByIdsForUpdate(ids),
-    );
-  }
-
-  async validateCategoriesExistReadOnly<T extends CategorySelectableColumns>(
-    ids: number[],
-    select: T[],
-  ): Promise<Pick<Category, T>[] | false> {
-    return this.validateEntitiesExist(ids, () =>
-      this.findManyByIdsReadOnly(ids, select),
-    );
+    return categories;
   }
 }

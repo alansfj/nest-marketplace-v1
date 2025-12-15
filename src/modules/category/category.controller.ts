@@ -9,7 +9,7 @@ export class CategoryController {
 
   @Get()
   @UseInterceptors(new DtoOutputInterceptor(FindAllCategoriesDtoOutput))
-  findAll() {
-    return this.categoryService.findAllReadOnly(['id', 'name']);
+  getCategoriesForStoreCreation() {
+    return this.categoryService.getCategoriesForStoreCreation();
   }
 }

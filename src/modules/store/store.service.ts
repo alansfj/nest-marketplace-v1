@@ -16,28 +16,24 @@ export class StoreService implements IStoreService {
   ) {}
 
   @Transactional()
-  async createStore(user: User, dto: CreateStoreDtoInput): Promise<Store> {
-    const validCategoriesEntities =
-      await this.categoryService.validateCategoriesExistForUpdate(
+  async createStore(user: User, dto: CreateStoreDtoInput) {
+    const categories =
+      await this.categoryService.validateCategoriesExistForStoreCreation(
         dto.categories,
       );
-
-    if (!validCategoriesEntities) {
-      throw new BadRequestException('Some categories are invalid');
-    }
 
     const newStoreEntity = Store.create({
       name: dto.name,
       description: dto.description,
       user,
-      categories: validCategoriesEntities,
+      categories,
     });
 
     return await this.storeRepository.save(newStoreEntity);
   }
 
   @Transactional()
-  async validateStoreName(storeName: string): Promise<{ valid: boolean }> {
+  async validateStoreName(storeName: string) {
     const storeNameNormalized = Store.normalizeName(storeName);
 
     if (!storeNameNormalized) {
