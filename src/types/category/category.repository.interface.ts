@@ -15,8 +15,10 @@ export abstract class ICategoryRepository {
     select?: T[],
   ): Promise<Pick<Category, T> | null>;
 
-  abstract findManyByIds<T extends CategorySelectableColumns>(
+  abstract findManyByIdsReadOnly<T extends CategorySelectableColumns>(
     ids: number[],
     select?: T[],
-  ): Promise<Pick<Category, T>[] | []>;
+  ): Promise<Pick<Category, T>[]>;
+
+  abstract findManyByIdsForUpdate(ids: number[]): Promise<Category[]>;
 }

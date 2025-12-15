@@ -6,7 +6,7 @@ import {
   TABLE_ALIAS_CATEGORY,
 } from 'src/entities/category.entity';
 import { ICategoryRepository } from 'src/types/category/category.repository.interface';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 
 @Injectable()
 export class CategoryTypeormRepository implements ICategoryRepository {
@@ -19,12 +19,10 @@ export class CategoryTypeormRepository implements ICategoryRepository {
     return this.repo.createQueryBuilder(TABLE_ALIAS_CATEGORY);
   }
 
-  private qbSelectedColumns(select?: CategorySelectableColumns[]) {
+  private qbSelectedColumns(select: CategorySelectableColumns[]) {
     const qb = this.qb();
 
-    if (select?.length) {
-      qb.select(select.map((col) => `${TABLE_ALIAS_CATEGORY}.${col}`));
-    }
+    qb.select(select.map((col) => `${TABLE_ALIAS_CATEGORY}.${col}`));
 
     return qb;
   }
@@ -34,7 +32,7 @@ export class CategoryTypeormRepository implements ICategoryRepository {
   }
 
   async findAll<T extends CategorySelectableColumns>(
-    select?: T[],
+    select: T[],
   ): Promise<Pick<Category, T>[] | []> {
     const qb = this.qbSelectedColumns(select);
 
@@ -43,21 +41,31 @@ export class CategoryTypeormRepository implements ICategoryRepository {
 
   async findOneById<T extends CategorySelectableColumns>(
     id: number,
-    select?: T[],
+    select: T[],
   ): Promise<Pick<Category, T> | null> {
     const qb = this.qbSelectedColumns(select);
 
     return qb.where(`${TABLE_ALIAS_CATEGORY}.id = :id`, { id }).getOne();
   }
 
-  async findManyByIds<T extends CategorySelectableColumns>(
-    ids: number[],
-    select?: T[],
-  ): Promise<Pick<Category, T>[] | []> {
-    const qb = this.qbSelectedColumns(select);
-
+  private findManyByIds(qb: SelectQueryBuilder<Category>, ids: number[]) {
     return qb
       .where(`${TABLE_ALIAS_CATEGORY}.id IN (:...ids)`, { ids })
       .getMany();
+  }
+
+  async findManyByIdsReadOnly<T extends CategorySelectableColumns>(
+    ids: number[],
+    select: T[],
+  ): Promise<Pick<Category, T>[]> {
+    const qb = this.qbSelectedColumns(select);
+
+    return this.findManyByIds(qb, ids);
+  }
+
+  async findManyByIdsForUpdate(ids: number[]): Promise<Category[]> {
+    const qb = this.qb().setLock('pessimistic_write');
+
+    return this.findManyByIds(qb, ids);
   }
 }

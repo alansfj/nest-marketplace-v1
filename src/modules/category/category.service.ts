@@ -24,23 +24,42 @@ export class CategoryService implements ICategoryService {
     return await this.categoryRepository.findOneById(id, select);
   }
 
-  async findManyByIds<T extends CategorySelectableColumns>(
+  async findManyByIdsReadOnly<T extends CategorySelectableColumns>(
     ids: number[],
-    select?: T[],
-  ): Promise<Pick<Category, T>[] | []> {
-    return await this.categoryRepository.findManyByIds(ids, select);
+    select: T[],
+  ): Promise<Pick<Category, T>[]> {
+    return await this.categoryRepository.findManyByIdsReadOnly(ids, select);
   }
 
-  async validateCategoriesExist<T extends CategorySelectableColumns>(
+  async findManyByIdsForUpdate(ids: number[]): Promise<Category[]> {
+    return await this.categoryRepository.findManyByIdsForUpdate(ids);
+  }
+
+  private async validateEntitiesExist<T>(
     ids: number[],
-    select?: T[],
-  ): Promise<Pick<Category, T>[] | false> {
+    finder: () => Promise<T[]>,
+  ): Promise<T[] | false> {
     if (!ids.length) return false;
 
-    const categories = await this.findManyByIds(ids, select);
+    const entities = await finder();
 
-    if (ids.length === categories.length) return categories;
+    return ids.length === entities.length ? entities : false;
+  }
 
-    return false;
+  async validateCategoriesExistReadOnly<T extends CategorySelectableColumns>(
+    ids: number[],
+    select: T[],
+  ): Promise<Pick<Category, T>[] | false> {
+    return this.validateEntitiesExist(ids, () =>
+      this.findManyByIdsReadOnly(ids, select),
+    );
+  }
+
+  async validateCategoriesExistForUpdate(
+    ids: number[],
+  ): Promise<Category[] | false> {
+    return this.validateEntitiesExist(ids, () =>
+      this.findManyByIdsForUpdate(ids),
+    );
   }
 }

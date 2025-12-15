@@ -13,13 +13,19 @@ export abstract class ICategoryService {
     select?: T[],
   ): Promise<Pick<Category, T>[] | []>;
 
-  abstract findManyByIds<T extends CategorySelectableColumns>(
+  abstract findManyByIdsReadOnly<T extends CategorySelectableColumns>(
     ids: number[],
-    select?: T[],
-  ): Promise<Pick<Category, T>[] | []>;
+    select: T[],
+  ): Promise<Pick<Category, T>[]>;
 
-  abstract validateCategoriesExist<T extends CategorySelectableColumns>(
+  abstract findManyByIdsForUpdate(ids: number[]): Promise<Category[]>;
+
+  abstract validateCategoriesExistReadOnly<T extends CategorySelectableColumns>(
     ids: number[],
     select?: T[],
   ): Promise<Pick<Category, T>[] | false>;
+
+  abstract validateCategoriesExistForUpdate(
+    ids: number[],
+  ): Promise<Category[] | false>;
 }

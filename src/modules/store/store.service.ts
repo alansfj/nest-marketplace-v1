@@ -7,7 +7,6 @@ import { Store } from 'src/entities/store.entity';
 import { ICategoryService } from 'src/types/category/category.service.interface';
 import { IStoreRepository } from 'src/types/store/store.repository.interface';
 import { User } from 'src/entities/user.entity';
-import { Category } from 'src/entities/category.entity';
 
 @Injectable()
 export class StoreService implements IStoreService {
@@ -19,10 +18,9 @@ export class StoreService implements IStoreService {
   @Transactional()
   async createStore(user: User, dto: CreateStoreDtoInput): Promise<Store> {
     const validCategoriesEntities =
-      await this.categoryService.validateCategoriesExist(dto.categories, [
-        'id',
-        'name',
-      ]);
+      await this.categoryService.validateCategoriesExistForUpdate(
+        dto.categories,
+      );
 
     if (!validCategoriesEntities) {
       throw new BadRequestException('Some categories are invalid');
@@ -32,7 +30,7 @@ export class StoreService implements IStoreService {
       name: dto.name,
       description: dto.description,
       user,
-      categories: validCategoriesEntities as Category[],
+      categories: validCategoriesEntities,
     });
 
     return await this.storeRepository.save(newStoreEntity);
