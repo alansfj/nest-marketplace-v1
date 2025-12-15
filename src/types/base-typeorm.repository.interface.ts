@@ -15,7 +15,7 @@ export abstract class IBaseTypeormRepository<
     select?: TSelectableColumns[],
   ): SelectQueryBuilder<TEntity>;
 
-  protected abstract save(entity: TEntity): Promise<TEntity>;
+  abstract save(entity: TEntity): Promise<TEntity>;
 
   protected abstract findOneById(
     qb: SelectQueryBuilder<TEntity>,

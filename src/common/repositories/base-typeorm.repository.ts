@@ -29,7 +29,7 @@ export class BaseTypeormRepository<
     return qb;
   }
 
-  protected async save(entity: TEntity): Promise<TEntity> {
+  async save(entity: TEntity): Promise<TEntity> {
     return await this.repo.save(entity);
   }
 

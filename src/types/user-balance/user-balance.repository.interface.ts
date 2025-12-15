@@ -2,10 +2,12 @@ import {
   UserBalance,
   UserBalanceSelectableColumns,
 } from 'src/entities/user-balance.entity';
+import { IBaseTypeormRepository } from '../base-typeorm.repository.interface';
 
-export abstract class IUserBalanceRepository {
-  abstract save(userBalance: UserBalance): Promise<UserBalance>;
-
+export abstract class IUserBalanceRepository extends IBaseTypeormRepository<
+  UserBalance,
+  UserBalanceSelectableColumns
+> {
   abstract findOneByUserIdForUpdate(
     userId: number,
   ): Promise<UserBalance | null>;

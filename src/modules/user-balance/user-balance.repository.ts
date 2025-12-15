@@ -8,29 +8,19 @@ import {
   UserBalanceSelectableColumns,
 } from 'src/entities/user-balance.entity';
 import { IUserBalanceRepository } from 'src/types/user-balance/user-balance.repository.interface';
+import { BaseTypeormRepository } from 'src/common/repositories/base-typeorm.repository';
 
 @Injectable()
-export class UserBalanceTypeormRepository implements IUserBalanceRepository {
+export class UserBalanceTypeormRepository
+  extends BaseTypeormRepository<UserBalance, UserBalanceSelectableColumns>
+  implements IUserBalanceRepository
+{
   constructor(
     @InjectRepository(UserBalance)
-    private repo: Repository<UserBalance>,
-  ) {}
-
-  private qb() {
-    return this.repo.createQueryBuilder(TABLE_ALIAS_USER_BALANCE);
+    repo: Repository<UserBalance>,
+  ) {
+    super(repo);
   }
-
-  private qbSelectedColumns(select: UserBalanceSelectableColumns[]) {
-    const qb = this.qb();
-
-    qb.select(select.map((col) => `${TABLE_ALIAS_USER_BALANCE}.${col}`));
-
-    return qb;
-  }
-
-  save: IUserBalanceRepository['save'] = async (userBalance) => {
-    return await this.repo.save(userBalance);
-  };
 
   private findOneByUserId(qb: SelectQueryBuilder<UserBalance>, userId: number) {
     return qb
@@ -38,17 +28,21 @@ export class UserBalanceTypeormRepository implements IUserBalanceRepository {
       .getOne();
   }
 
+  // ForUpdate
+
+  async findOneByUserIdForUpdate(userId: number): Promise<UserBalance | null> {
+    const qb = this.qb().setLock('pessimistic_write');
+
+    return this.findOneByUserId(qb, userId);
+  }
+
+  // ReadOnly
+
   async findOneByUserIdReadOnly<T extends UserBalanceSelectableColumns>(
     userId: number,
     select: T[],
   ): Promise<Pick<UserBalance, T> | null> {
     const qb = this.qbSelectedColumns(select);
-
-    return this.findOneByUserId(qb, userId);
-  }
-
-  async findOneByUserIdForUpdate(userId: number): Promise<UserBalance | null> {
-    const qb = this.qb().setLock('pessimistic_write');
 
     return this.findOneByUserId(qb, userId);
   }
