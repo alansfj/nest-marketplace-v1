@@ -61,7 +61,7 @@ export class BaseTypeormRepository<
   }
 
   async findAllForUpdate(): Promise<TEntity[]> {
-    const qb = this.qb();
+    const qb = this.qb().setLock('pessimistic_write');
     return this.findAll(qb);
   }
 
