@@ -1,11 +1,9 @@
-import { Store, StoreSelectableColumns } from 'src/entities/store.entity';
-import { PrimitiveColumns } from '../selectable-columns.type';
+import { Store } from 'src/entities/store.entity';
+import { IBaseTypeormRepository } from '../base-typeorm.repository.interface';
 
-export abstract class IStoreRepository {
-  abstract save(user: Store): Promise<Store>;
-
-  abstract findOneEqualBy<T extends StoreSelectableColumns>(
-    options: Partial<Record<StoreSelectableColumns, PrimitiveColumns>>,
-    select?: T[],
-  ): Promise<Pick<Store, T> | null>;
+export abstract class IStoreRepository extends IBaseTypeormRepository<Store> {
+  // abstract findOneEqualBy<T extends StoreSelectableColumns>(
+  //   options: Partial<Record<StoreSelectableColumns, PrimitiveColumns>>,
+  //   select?: T[],
+  // ): Promise<Pick<Store, T> | null>;
 }

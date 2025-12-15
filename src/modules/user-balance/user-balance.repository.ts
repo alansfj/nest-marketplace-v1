@@ -15,6 +15,8 @@ export class UserBalanceTypeormRepository
   extends BaseTypeormRepository<UserBalance>
   implements IUserBalanceRepository
 {
+  protected readonly alias = TABLE_ALIAS_USER_BALANCE;
+
   constructor(
     @InjectRepository(UserBalance)
     repo: Repository<UserBalance>,
@@ -22,21 +24,19 @@ export class UserBalanceTypeormRepository
     super(repo);
   }
 
+  // findOneByUserId
+
   private findOneByUserId(qb: SelectQueryBuilder<UserBalance>, userId: number) {
     return qb
       .where(`${TABLE_ALIAS_USER_BALANCE}.userId = :userId`, { userId })
       .getOne();
   }
 
-  // ForUpdate
-
   async findOneByUserIdForUpdate(userId: number): Promise<UserBalance | null> {
     const qb = this.qb().setLock('pessimistic_write');
 
     return this.findOneByUserId(qb, userId);
   }
-
-  // ReadOnly
 
   async findOneByUserIdReadOnly<T extends UserBalanceSelectableColumns>(
     userId: number,

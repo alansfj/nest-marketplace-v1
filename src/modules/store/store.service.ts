@@ -44,7 +44,7 @@ export class StoreService implements IStoreService {
       throw new BadRequestException('a valid name is required');
     }
 
-    const store = await this.storeRepository.findOneEqualBy(
+    const store = await this.storeRepository.findOneByEqualReadOnly(
       { nameNormalized: storeNameNormalized },
       ['id'],
     );

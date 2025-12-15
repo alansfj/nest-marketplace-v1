@@ -1,6 +1,9 @@
 import { ObjectLiteral, Repository, SelectQueryBuilder } from 'typeorm';
 
-import { SelectableColumns } from 'src/types/selectable-columns.type';
+import {
+  PrimitiveColumns,
+  SelectableColumns,
+} from 'src/types/selectable-columns.type';
 import { IBaseTypeormRepository } from 'src/types/base-typeorm.repository.interface';
 
 export class BaseTypeormRepository<
@@ -92,5 +95,65 @@ export class BaseTypeormRepository<
   ): Promise<Pick<TEntity, T>[]> {
     const qb = this.qbSelectedColumns(select);
     return this.findManyByIds(qb, ids);
+  }
+
+  // findOneByEqual
+
+  protected findOneByEqual(
+    qb: SelectQueryBuilder<TEntity>,
+    options: Partial<Record<SelectableColumns<TEntity>, PrimitiveColumns>>,
+  ): Promise<TEntity | null> {
+    Object.entries(options).forEach(([key, value]) => {
+      qb.andWhere(`${this.alias}.${key} = :${key}`, { [key]: value });
+    });
+
+    return qb.getOne();
+  }
+
+  async findOneByEqualForUpdate(
+    options: Partial<Record<SelectableColumns<TEntity>, PrimitiveColumns>>,
+  ): Promise<TEntity | null> {
+    const qb = this.qb().setLock('pessimistic_write');
+
+    return await this.findOneByEqual(qb, options);
+  }
+
+  async findOneByEqualReadOnly<T extends SelectableColumns<TEntity>>(
+    options: Partial<Record<SelectableColumns<TEntity>, PrimitiveColumns>>,
+    select: T[],
+  ): Promise<Pick<TEntity, T> | null> {
+    const qb = this.qbSelectedColumns(select);
+
+    return await this.findOneByEqual(qb, options);
+  }
+
+  // findManyByEqual
+
+  protected findManyByEqual(
+    qb: SelectQueryBuilder<TEntity>,
+    options: Partial<Record<SelectableColumns<TEntity>, PrimitiveColumns>>,
+  ): Promise<TEntity[]> {
+    Object.entries(options).forEach(([key, value]) => {
+      qb.andWhere(`${this.alias}.${key} = :${key}`, { [key]: value });
+    });
+
+    return qb.getMany();
+  }
+
+  async findManyByEqualForUpdate(
+    options: Partial<Record<SelectableColumns<TEntity>, PrimitiveColumns>>,
+  ): Promise<TEntity[]> {
+    const qb = this.qb().setLock('pessimistic_write');
+
+    return await this.findManyByEqual(qb, options);
+  }
+
+  async findManyByEqualReadOnly<T extends SelectableColumns<TEntity>>(
+    options: Partial<Record<SelectableColumns<TEntity>, PrimitiveColumns>>,
+    select: T[],
+  ): Promise<Pick<TEntity, T>[]> {
+    const qb = this.qbSelectedColumns(select);
+
+    return await this.findManyByEqual(qb, options);
   }
 }

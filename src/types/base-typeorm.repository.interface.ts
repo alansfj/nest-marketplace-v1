@@ -1,6 +1,6 @@
 import { ObjectLiteral, Repository, SelectQueryBuilder } from 'typeorm';
 
-import { SelectableColumns } from './selectable-columns.type';
+import { PrimitiveColumns, SelectableColumns } from './selectable-columns.type';
 
 export abstract class IBaseTypeormRepository<TEntity extends ObjectLiteral> {
   protected abstract readonly alias: string;
@@ -51,6 +51,38 @@ export abstract class IBaseTypeormRepository<TEntity extends ObjectLiteral> {
 
   abstract findManyByIdsReadOnly<T extends SelectableColumns<TEntity>>(
     ids: number[],
+    select: T[],
+  ): Promise<Pick<TEntity, T>[]>;
+
+  // findOneByEqual
+
+  protected abstract findOneByEqual(
+    qb: SelectQueryBuilder<TEntity>,
+    options: Partial<Record<SelectableColumns<TEntity>, PrimitiveColumns>>,
+  ): Promise<TEntity | null>;
+
+  abstract findOneByEqualForUpdate(
+    options: Partial<Record<SelectableColumns<TEntity>, PrimitiveColumns>>,
+  ): Promise<TEntity | null>;
+
+  abstract findOneByEqualReadOnly<T extends SelectableColumns<TEntity>>(
+    options: Partial<Record<SelectableColumns<TEntity>, PrimitiveColumns>>,
+    select: T[],
+  ): Promise<Pick<TEntity, T> | null>;
+
+  // findManyByEqual
+
+  protected abstract findManyByEqual(
+    qb: SelectQueryBuilder<TEntity>,
+    options: Partial<Record<SelectableColumns<TEntity>, PrimitiveColumns>>,
+  ): Promise<TEntity[]>;
+
+  abstract findManyByEqualForUpdate(
+    options: Partial<Record<SelectableColumns<TEntity>, PrimitiveColumns>>,
+  ): Promise<TEntity[]>;
+
+  abstract findManyByEqualReadOnly<T extends SelectableColumns<TEntity>>(
+    options: Partial<Record<SelectableColumns<TEntity>, PrimitiveColumns>>,
     select: T[],
   ): Promise<Pick<TEntity, T>[]>;
 }
