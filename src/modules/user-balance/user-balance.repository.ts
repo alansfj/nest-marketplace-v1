@@ -12,7 +12,7 @@ import { BaseTypeormRepository } from 'src/common/repositories/base-typeorm.repo
 
 @Injectable()
 export class UserBalanceTypeormRepository
-  extends BaseTypeormRepository<UserBalance, UserBalanceSelectableColumns>
+  extends BaseTypeormRepository<UserBalance>
   implements IUserBalanceRepository
 {
   constructor(

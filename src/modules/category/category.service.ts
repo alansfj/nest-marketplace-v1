@@ -48,7 +48,7 @@ export class CategoryService implements ICategoryService {
 
   async findAllReadOnly<T extends CategorySelectableColumns>(
     select: T[],
-  ): Promise<Pick<Category, T>[] | []> {
+  ): Promise<Pick<Category, T>[]> {
     return await this.categoryRepository.findAllReadOnly(select);
   }
 

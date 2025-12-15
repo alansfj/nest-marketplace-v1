@@ -4,10 +4,7 @@ import {
 } from 'src/entities/user-balance.entity';
 import { IBaseTypeormRepository } from '../base-typeorm.repository.interface';
 
-export abstract class IUserBalanceRepository extends IBaseTypeormRepository<
-  UserBalance,
-  UserBalanceSelectableColumns
-> {
+export abstract class IUserBalanceRepository extends IBaseTypeormRepository<UserBalance> {
   abstract findOneByUserIdForUpdate(
     userId: number,
   ): Promise<UserBalance | null>;

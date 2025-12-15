@@ -1,26 +1,4 @@
-import {
-  Category,
-  CategorySelectableColumns,
-} from 'src/entities/category.entity';
+import { Category } from 'src/entities/category.entity';
+import { IBaseTypeormRepository } from '../base-typeorm.repository.interface';
 
-export abstract class ICategoryRepository {
-  abstract findAllForUpdate(): Promise<Category[]>;
-
-  abstract findAllReadOnly<T extends CategorySelectableColumns>(
-    select: T[],
-  ): Promise<Pick<Category, T>[]>;
-
-  abstract findOneByIdForUpdate(id: number): Promise<Category | null>;
-
-  abstract findOneByIdReadOnly<T extends CategorySelectableColumns>(
-    id: number,
-    select: T[],
-  ): Promise<Pick<Category, T> | null>;
-
-  abstract findManyByIdsForUpdate(ids: number[]): Promise<Category[]>;
-
-  abstract findManyByIdsReadOnly<T extends CategorySelectableColumns>(
-    ids: number[],
-    select: T[],
-  ): Promise<Pick<Category, T>[]>;
-}
+export abstract class ICategoryRepository extends IBaseTypeormRepository<Category> {}
