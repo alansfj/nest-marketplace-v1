@@ -24,9 +24,7 @@ export class CategoryTypeormRepository
     super(repo);
   }
 
-  /* ============================
-   * WRITE / FOR UPDATE
-   * ============================ */
+  // ForUpdate
 
   async findAllForUpdate(): Promise<Category[]> {
     const qb = this.qb().setLock('pessimistic_write');
@@ -43,9 +41,7 @@ export class CategoryTypeormRepository
     return this.findManyByIds(qb, ids);
   }
 
-  /* ============================
-   * READ ONLY
-   * ============================ */
+  // ReadOnly
 
   async findAllReadOnly<T extends CategorySelectableColumns>(
     select: T[],
