@@ -38,12 +38,9 @@ export class BaseTypeormRepository<
   // exist
 
   async existsById(id: number): Promise<boolean> {
-    const select = ['id'];
-
-    const exist = await this.findOneByIdReadOnly(
-      id,
-      select as SelectableColumns<TEntity>[],
-    );
+    const exist = await this.findOneByIdReadOnly(id, [
+      'id',
+    ] as SelectableColumns<TEntity>[]);
 
     return !!exist;
   }
@@ -51,12 +48,9 @@ export class BaseTypeormRepository<
   async existsByEqual(
     options: Partial<Record<SelectableColumns<TEntity>, PrimitiveColumns>>,
   ): Promise<boolean> {
-    const select = ['id'];
-
-    const exists = await this.findOneByEqualReadOnly(
-      options,
-      select as SelectableColumns<TEntity>[],
-    );
+    const exists = await this.findOneByEqualReadOnly(options, [
+      'id',
+    ] as SelectableColumns<TEntity>[]);
 
     return !!exists;
   }
