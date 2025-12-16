@@ -14,6 +14,13 @@ export abstract class IBaseTypeormRepository<TEntity extends ObjectLiteral> {
 
   abstract save(entity: TEntity): Promise<TEntity>;
 
+  // exists
+  abstract existsById(id: number): Promise<boolean>;
+
+  abstract existsByEqual(
+    options: Partial<Record<SelectableColumns<TEntity>, PrimitiveColumns>>,
+  ): Promise<boolean>;
+
   // findOneById
 
   protected abstract findOneById(

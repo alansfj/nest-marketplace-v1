@@ -19,7 +19,7 @@ export class BaseTypeormRepository<
     return this.repo.createQueryBuilder(this.alias);
   }
 
-  protected qbSelectedColumns(select?: SelectableColumns<TEntity>[]) {
+  protected qbSelectedColumns(select: SelectableColumns<TEntity>[]) {
     const qb = this.qb();
 
     if (!select || !select.length) {
@@ -33,6 +33,32 @@ export class BaseTypeormRepository<
 
   async save(entity: TEntity): Promise<TEntity> {
     return await this.repo.save(entity);
+  }
+
+  // exist
+
+  async existsById(id: number): Promise<boolean> {
+    const select = ['id'];
+
+    const exist = await this.findOneByIdReadOnly(
+      id,
+      select as SelectableColumns<TEntity>[],
+    );
+
+    return !!exist;
+  }
+
+  async existsByEqual(
+    options: Partial<Record<SelectableColumns<TEntity>, PrimitiveColumns>>,
+  ): Promise<boolean> {
+    const select = ['id'];
+
+    const exists = await this.findOneByEqualReadOnly(
+      options,
+      select as SelectableColumns<TEntity>[],
+    );
+
+    return !!exists;
   }
 
   // findOneById

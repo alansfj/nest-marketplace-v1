@@ -56,10 +56,9 @@ export class UserService implements IUserService {
 
   @Transactional()
   async registerNewUser(registerDto: RegisterDtoInput): Promise<User> {
-    const userExists = await this.userRepository.findOneByEqualReadOnly(
-      { email: registerDto.email },
-      ['id'],
-    );
+    const userExists = await this.userRepository.existsByEqual({
+      email: registerDto.email,
+    });
 
     if (userExists) {
       throw new BadRequestException('User with that email already exists');
