@@ -1,10 +1,14 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { Transactional } from 'typeorm-transactional';
 
-import { User, UserSelectableColumns } from '../../entities/user.entity';
+import { User } from '../../entities/user.entity';
 import { RegisterDtoInput } from '../auth/dtos/register/register.dto.input';
-import { ConfigService } from '@nestjs/config';
 import { IUserRepository } from 'src/types/user/user.repository.interface';
 import { IUserService } from 'src/types/user/user.service.interface';
 import { IUserBalanceService } from 'src/types/user-balance/user-balance.service.interface';
@@ -17,27 +21,45 @@ export class UserService implements IUserService {
     private readonly userBalanceService: IUserBalanceService,
   ) {}
 
-  // methods without logic
+  async getUserForPasswordValidation(email: string): Promise<User> {
+    const user = await this.userRepository.findOneByEqualReadOnly({ email }, [
+      'id',
+      'email',
+      'password',
+      'firstName',
+      'lastName',
+      'createdDate',
+      'updatedDate',
+      'deletedDate',
+    ]);
 
-  async findOneById<T extends UserSelectableColumns>(
-    id: number,
-    select: T[],
-  ): Promise<Pick<User, T> | null> {
-    return await this.userRepository.findOneByIdReadOnly(id, select);
+    if (user) return user as User;
+
+    throw new BadRequestException('user not found');
   }
 
-  async findOneByEmail<T extends UserSelectableColumns>(
-    email: string,
-    select: T[],
-  ): Promise<Pick<User, T> | null> {
-    return await this.userRepository.findOneByEqualReadOnly({ email }, select);
-  }
+  async getAuthorizedUser(id: number): Promise<User> {
+    const user = await this.userRepository.findOneByEqualReadOnly({ id }, [
+      'id',
+      'email',
+      'firstName',
+      'lastName',
+      'createdDate',
+      'updatedDate',
+      'deletedDate',
+    ]);
 
-  // methods with logic
+    if (user) return user as User;
+
+    throw new UnauthorizedException();
+  }
 
   @Transactional()
-  async registerUser(registerDto: RegisterDtoInput): Promise<User> {
-    const userExists = await this.findOneByEmail(registerDto.email, ['id']);
+  async registerNewUser(registerDto: RegisterDtoInput): Promise<User> {
+    const userExists = await this.userRepository.findOneByEqualReadOnly(
+      { email: registerDto.email },
+      ['id'],
+    );
 
     if (userExists) {
       throw new BadRequestException('User with that email already exists');

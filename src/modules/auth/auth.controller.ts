@@ -25,11 +25,11 @@ export class AuthController {
   @Post('register')
   @Public()
   @UseInterceptors(new DtoOutputInterceptor(RegisterDtoOutput))
-  registerUser(
+  registerNewUser(
     @Body(new ZodValidationPipe(createUserSchema))
     registerDto: RegisterDtoInput,
   ) {
-    return this.authService.registerUser(registerDto);
+    return this.authService.registerNewUser(registerDto);
   }
 
   @Post('login')

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
@@ -13,21 +13,21 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async registerUser(registerDto: RegisterDtoInput): Promise<User> {
-    return this.userService.registerUser(registerDto);
+  async registerNewUser(registerDto: RegisterDtoInput): Promise<User> {
+    return this.userService.registerNewUser(registerDto);
   }
 
-  async validateUser(
+  async validateUserPassword(
     email: string,
     userPassword: string,
-  ): Promise<User | null> {
-    const user = await this.userService.findOneByEmail(email);
-
-    if (!user) return null;
+  ): Promise<User> {
+    const user = await this.userService.getUserForPasswordValidation(email);
 
     const isMatch = await bcrypt.compare(userPassword, user.password);
 
-    if (!user || !isMatch) return null;
+    if (!user || !isMatch) {
+      throw new BadRequestException('bad credentials');
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...rest } = user;
