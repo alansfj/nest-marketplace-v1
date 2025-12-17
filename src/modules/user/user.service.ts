@@ -32,7 +32,7 @@ export class UserService implements IUserService {
   }
 
   async getAuthorizedUser(id: number): Promise<IAuthUser> {
-    const user = await this.userRepository.findOneByEqualReadOnly({ id }, [
+    const user = await this.userRepository.findOneByIdReadOnly(id, [
       'id',
       'email',
       'firstName',
