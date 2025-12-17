@@ -12,6 +12,7 @@ import { RegisterDtoInput } from '../auth/dtos/register/register.dto.input';
 import { IUserRepository } from 'src/types/user/user.repository.interface';
 import { IUserService } from 'src/types/user/user.service.interface';
 import { IUserBalanceService } from 'src/types/user-balance/user-balance.service.interface';
+import { IAuthUser } from 'src/types/auth-user.interface';
 
 @Injectable()
 export class UserService implements IUserService {
@@ -38,20 +39,25 @@ export class UserService implements IUserService {
     throw new BadRequestException('user not found');
   }
 
-  async getAuthorizedUser(id: number): Promise<User> {
+  async getAuthorizedUser(id: number): Promise<IAuthUser> {
     const user = await this.userRepository.findOneByEqualReadOnly({ id }, [
       'id',
       'email',
       'firstName',
       'lastName',
-      'createdDate',
-      'updatedDate',
-      'deletedDate',
     ]);
 
-    if (user) return user as User;
+    if (user) return user;
 
     throw new UnauthorizedException();
+  }
+
+  async getUserFromId(id: number): Promise<User> {
+    const user = await this.userRepository.findOneByIdForUpdate(id);
+
+    if (user) return user;
+
+    throw new UnauthorizedException('Unauthorized User');
   }
 
   @Transactional()

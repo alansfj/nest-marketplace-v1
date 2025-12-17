@@ -16,7 +16,7 @@ import { RegisterDtoInput } from 'src/modules/auth/dtos/register/register.dto.in
 import { DtoOutputInterceptor } from 'src/common/interceptors/dto-output.interceptor';
 import { RegisterDtoOutput } from './dtos/register/register.dto.output';
 import { AuthUser } from 'src/common/decorators/user.decorator';
-import { User } from 'src/entities/user.entity';
+import { IAuthUser } from 'src/types/auth-user.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -35,12 +35,12 @@ export class AuthController {
   @Post('login')
   @Public()
   @UseGuards(LocalAuthGuard)
-  async login(@AuthUser() user: User) {
+  async login(@AuthUser() user: IAuthUser) {
     return this.authService.login(user);
   }
 
   @Get('test')
-  test(@AuthUser() user: User) {
+  test(@AuthUser() user: IAuthUser) {
     return user;
   }
 }

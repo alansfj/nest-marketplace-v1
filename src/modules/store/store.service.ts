@@ -6,21 +6,24 @@ import { CreateStoreDtoInput } from './dtos/create-store.dto.input';
 import { Store } from 'src/entities/store.entity';
 import { ICategoryService } from 'src/types/category/category.service.interface';
 import { IStoreRepository } from 'src/types/store/store.repository.interface';
-import { User } from 'src/entities/user.entity';
+import { IUserService } from 'src/types/user/user.service.interface';
 
 @Injectable()
 export class StoreService implements IStoreService {
   constructor(
     private readonly storeRepository: IStoreRepository,
     private readonly categoryService: ICategoryService,
+    private readonly userService: IUserService,
   ) {}
 
   @Transactional()
-  async createStore(user: User, dto: CreateStoreDtoInput) {
-    const categories =
-      await this.categoryService.validateCategoriesExistForStoreCreation(
+  async createStore(userId: number, dto: CreateStoreDtoInput) {
+    const [user, categories] = await Promise.all([
+      this.userService.getUserFromId(userId),
+      this.categoryService.validateCategoriesExistForStoreCreation(
         dto.categories,
-      );
+      ),
+    ]);
 
     const newStoreEntity = Store.create({
       name: dto.name,

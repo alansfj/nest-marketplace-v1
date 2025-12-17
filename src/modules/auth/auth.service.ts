@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt';
 
 import { User } from 'src/entities/user.entity';
 import { RegisterDtoInput } from 'src/modules/auth/dtos/register/register.dto.input';
+import { IAuthUser } from 'src/types/auth-user.interface';
 import { IUserService } from 'src/types/user/user.service.interface';
 
 @Injectable()
@@ -35,7 +36,7 @@ export class AuthService {
     return rest as User;
   }
 
-  async login(user: User): Promise<{
+  async login(user: IAuthUser): Promise<{
     access_token: string;
   }> {
     const payload = {

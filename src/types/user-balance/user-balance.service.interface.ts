@@ -5,7 +5,7 @@ export abstract class IUserBalanceService {
   abstract createForNewUser(user: User): Promise<UserBalance>;
 
   abstract increaseUserBalance(
-    user: User,
+    userId: number,
     quantity: number,
   ): Promise<UserBalance>;
 }

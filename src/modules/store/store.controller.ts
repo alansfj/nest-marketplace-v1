@@ -14,9 +14,9 @@ import { AuthUser } from 'src/common/decorators/user.decorator';
 import { IStoreService } from 'src/types/store/store.service.interface';
 import { DtoOutputInterceptor } from 'src/common/interceptors/dto-output.interceptor';
 import { CreateStoreDtoOutput } from './dtos/create-store.dto.output';
-import { User } from 'src/entities/user.entity';
 import { validateStoreNameSchema } from 'src/common/schemas/validate-store-name.schema';
 import { ValidateStoreNameDtoInput } from './dtos/validate-store-name.dto.input';
+import { IAuthUser } from 'src/types/auth-user.interface';
 
 @Controller('store')
 export class StoreController {
@@ -25,11 +25,11 @@ export class StoreController {
   @Post()
   @UseInterceptors(new DtoOutputInterceptor(CreateStoreDtoOutput))
   createStore(
-    @AuthUser() user: User,
+    @AuthUser() user: IAuthUser,
     @Body(new ZodValidationPipe(createStoreSchema))
     dto: CreateStoreDtoInput,
   ) {
-    return this.storeService.createStore(user, dto);
+    return this.storeService.createStore(user.id, dto);
   }
 
   @Get('validate-name')

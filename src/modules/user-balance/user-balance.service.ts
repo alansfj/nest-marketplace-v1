@@ -24,11 +24,11 @@ export class UserBalanceService implements IUserBalanceService {
 
   @Transactional()
   async increaseUserBalance(
-    user: User,
+    userId: number,
     quantity: number,
   ): Promise<UserBalance> {
     const userBalanceEntity =
-      await this.userBalanceRepository.findOneByUserIdForUpdate(user.id);
+      await this.userBalanceRepository.findOneByUserIdForUpdate(userId);
 
     if (!userBalanceEntity) {
       throw new BadRequestException('error getting user balance');
