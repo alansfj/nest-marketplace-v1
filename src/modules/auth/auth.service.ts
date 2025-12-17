@@ -4,7 +4,6 @@ import * as bcrypt from 'bcrypt';
 
 import { User } from 'src/entities/user.entity';
 import { RegisterDtoInput } from 'src/modules/auth/dtos/register/register.dto.input';
-import { IAuthUser } from 'src/types/auth-user.interface';
 import { IUserService } from 'src/types/user/user.service.interface';
 
 @Injectable()
@@ -18,25 +17,19 @@ export class AuthService {
     return this.userService.registerNewUser(registerDto);
   }
 
-  async validateUserPassword(
-    email: string,
-    userPassword: string,
-  ): Promise<User> {
+  async validateUserPassword(email: string, password: string): Promise<User> {
     const user = await this.userService.getUserForPasswordValidation(email);
 
-    const isMatch = await bcrypt.compare(userPassword, user.password);
+    const isMatch = await bcrypt.compare(password, user.password);
 
     if (!user || !isMatch) {
       throw new BadRequestException('bad credentials');
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...rest } = user;
-
-    return rest as User;
+    return user;
   }
 
-  async login(user: IAuthUser): Promise<{
+  async login(user: User): Promise<{
     access_token: string;
   }> {
     const payload = {

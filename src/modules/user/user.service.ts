@@ -22,19 +22,11 @@ export class UserService implements IUserService {
     private readonly userBalanceService: IUserBalanceService,
   ) {}
 
+  @Transactional()
   async getUserForPasswordValidation(email: string): Promise<User> {
-    const user = await this.userRepository.findOneByEqualReadOnly({ email }, [
-      'id',
-      'email',
-      'password',
-      'firstName',
-      'lastName',
-      'createdDate',
-      'updatedDate',
-      'deletedDate',
-    ]);
+    const user = await this.userRepository.findOneByEqualForUpdate({ email });
 
-    if (user) return user as User;
+    if (user) return user;
 
     throw new BadRequestException('user not found');
   }

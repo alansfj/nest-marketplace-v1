@@ -7,7 +7,7 @@ import { IncreaseUserBalanceDtoInput } from './dtos/increase-user-balance.dto.in
 import { DtoOutputInterceptor } from 'src/common/interceptors/dto-output.interceptor';
 import { IncreaseUserBalanceDtoOutput } from './dtos/increase-user-balance.dto.output';
 import { IAuthUser } from 'src/types/auth-user.interface';
-import { AuthUser } from 'src/common/decorators/user.decorator';
+import { UserInReq } from 'src/common/decorators/user-in-req.decorator';
 
 @Controller('balance')
 export class UserBalanceController {
@@ -16,7 +16,7 @@ export class UserBalanceController {
   @Post('increase')
   @UseInterceptors(new DtoOutputInterceptor(IncreaseUserBalanceDtoOutput))
   increaseUserBalance(
-    @AuthUser() user: IAuthUser,
+    @UserInReq() user: IAuthUser,
     @Body(new ZodValidationPipe(increaseUserBalanceSchema))
     dto: IncreaseUserBalanceDtoInput,
   ) {
