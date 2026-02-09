@@ -36,7 +36,7 @@ const newEntitySchema = z.object({
   }),
   price: z.number().gt(0),
   currency: z.nativeEnum(Currency),
-  quantity: z.number().int().gt(0),
+  quantity: z.number().int().positive(),
 });
 
 type newEntityDto = Required<z.infer<typeof newEntitySchema>>;

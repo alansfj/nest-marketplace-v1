@@ -13,6 +13,7 @@ import { dataSourceOptions } from './data-source';
 import { UserBalanceModule } from './modules/user-balance/user-balance.module';
 import { StoreModule } from './modules/store/store.module';
 import { CategoryModules } from './modules/category/category.module';
+import { ProductModule } from './modules/product/product.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { CategoryModules } from './modules/category/category.module';
     UserBalanceModule,
     StoreModule,
     CategoryModules,
+    ProductModule,
   ],
   providers: [
     {
