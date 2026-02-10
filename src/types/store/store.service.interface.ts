@@ -8,4 +8,6 @@ export abstract class IStoreService {
   ): Promise<Store>;
 
   abstract validateStoreName(storeName: string): Promise<{ valid: boolean }>;
+
+  abstract getStoreFromId(id: number): Promise<Store>;
 }

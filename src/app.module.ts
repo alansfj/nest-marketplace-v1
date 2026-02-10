@@ -14,6 +14,7 @@ import { UserBalanceModule } from './modules/user-balance/user-balance.module';
 import { StoreModule } from './modules/store/store.module';
 import { CategoryModules } from './modules/category/category.module';
 import { ProductModule } from './modules/product/product.module';
+import { SubcategoryModule } from './modules/subcategory/subcategory.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { ProductModule } from './modules/product/product.module';
     StoreModule,
     CategoryModules,
     ProductModule,
+    SubcategoryModule,
   ],
   providers: [
     {

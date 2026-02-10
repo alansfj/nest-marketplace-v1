@@ -16,6 +16,14 @@ export class StoreService implements IStoreService {
     private readonly userService: IUserService,
   ) {}
 
+  async getStoreFromId(id: number): Promise<Store> {
+    const store = await this.storeRepository.findOneByIdForUpdate(id);
+
+    if (store) return store;
+
+    throw new BadRequestException('Store not found');
+  }
+
   @Transactional()
   async createStore(userId: number, dto: CreateStoreDtoInput) {
     const [user, categories] = await Promise.all([
