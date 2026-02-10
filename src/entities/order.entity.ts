@@ -36,7 +36,7 @@ export type ProductSelectableColumns = SelectableColumns<Order>;
 
 export const TABLE_NAME_ORDER = 'orders';
 
-export const TABLE_ALIAS_PRODUCT: Uppercase<typeof TABLE_NAME_ORDER> = 'ORDERS';
+export const TABLE_ALIAS_ORDER: Uppercase<typeof TABLE_NAME_ORDER> = 'ORDERS';
 
 @Entity(TABLE_NAME_ORDER)
 export class Order {

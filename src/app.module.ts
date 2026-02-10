@@ -15,6 +15,8 @@ import { StoreModule } from './modules/store/store.module';
 import { CategoryModules } from './modules/category/category.module';
 import { ProductModule } from './modules/product/product.module';
 import { SubcategoryModule } from './modules/subcategory/subcategory.module';
+import { OrderModule } from './modules/order/order.module';
+import { OrderItemModule } from './modules/order-item/order-item.module';
 
 @Module({
   imports: [
@@ -40,6 +42,8 @@ import { SubcategoryModule } from './modules/subcategory/subcategory.module';
     CategoryModules,
     ProductModule,
     SubcategoryModule,
+    OrderModule,
+    OrderItemModule,
   ],
   providers: [
     {

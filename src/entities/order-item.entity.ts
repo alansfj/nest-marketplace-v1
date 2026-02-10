@@ -39,12 +39,12 @@ type newEntityDto = Required<z.infer<typeof newEntitySchema>>;
 
 export type ProductSelectableColumns = SelectableColumns<OrderItem>;
 
-export const TABLE_NAME_ORDER = 'order_items';
+export const TABLE_NAME_ORDER_ITEM = 'order_items';
 
-export const TABLE_ALIAS_PRODUCT: Uppercase<typeof TABLE_NAME_ORDER> =
+export const TABLE_ALIAS_ORDER_ITEM: Uppercase<typeof TABLE_NAME_ORDER_ITEM> =
   'ORDER_ITEMS';
 
-@Entity(TABLE_NAME_ORDER)
+@Entity(TABLE_NAME_ORDER_ITEM)
 export class OrderItem {
   @Exclude()
   readonly __brand = 'OrderItem';
