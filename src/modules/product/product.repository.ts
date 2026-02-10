@@ -19,4 +19,11 @@ export class ProductTypeormRepository
   ) {
     super(repo);
   }
+
+  async findOneByIdWithOwner(id: number): Promise<Product | null> {
+    return await this.qb()
+      .leftJoinAndSelect(`${this.alias}.user`, 'user')
+      .where(`${this.alias}.id = :id`, { id })
+      .getOne();
+  }
 }

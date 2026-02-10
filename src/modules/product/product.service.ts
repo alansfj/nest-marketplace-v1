@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { Product } from 'src/entities/product.entity';
 import { IProductService } from 'src/types/product/product.service.interface';
@@ -17,6 +17,24 @@ export class ProductService implements IProductService {
     private readonly userService: IUserService,
     private readonly storeService: IStoreService,
   ) {}
+
+  @Transactional()
+  async getProductFromId(id: number): Promise<Product> {
+    const product = await this.productRepository.findOneByIdForUpdate(id);
+
+    if (product) return product;
+
+    throw new BadRequestException('Product not found');
+  }
+
+  @Transactional()
+  async getProductByIdWithOwner(id: number): Promise<Product> {
+    const product = await this.productRepository.findOneByIdWithOwner(id);
+
+    if (product) return product;
+
+    throw new BadRequestException('Product not found');
+  }
 
   @Transactional()
   async createProduct(

@@ -67,7 +67,7 @@ export class UserBalance {
     enum: Currency,
     default: Currency.MXN,
   })
-  currency: string;
+  currency: Currency;
 
   @CreateDateColumn()
   readonly createdDate: Date;

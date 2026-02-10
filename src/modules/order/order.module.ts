@@ -7,9 +7,11 @@ import { IOrderService } from 'src/types/order/order.service.interface';
 import { OrderService } from './order.service';
 import { IOrderRepository } from 'src/types/order/order.repository.interface';
 import { OrderTypeormRepository } from './order.repository';
+import { UserModule } from '../user/user.module';
+import { ProductModule } from '../product/product.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Order])],
+  imports: [TypeOrmModule.forFeature([Order]), UserModule, ProductModule],
   controllers: [OrderController],
   providers: [
     {

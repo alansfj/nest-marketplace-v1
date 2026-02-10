@@ -27,6 +27,10 @@ export class Money {
     return new Money(this.value.minus(amount.value));
   }
 
+  multiply(number: number | string | Decimal): Money {
+    return new Money(this.value.times(number));
+  }
+
   isNegative(): boolean {
     return this.value.isNegative();
   }

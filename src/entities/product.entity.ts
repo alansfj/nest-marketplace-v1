@@ -91,7 +91,7 @@ export class Product {
     enum: Currency,
     default: Currency.MXN,
   })
-  currency: string;
+  currency: Currency;
 
   @Column()
   quantity: number;

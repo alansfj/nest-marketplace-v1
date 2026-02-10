@@ -60,7 +60,7 @@ export class Order {
     enum: OrderStatus,
     default: OrderStatus.CART,
   })
-  status: string;
+  status: OrderStatus;
 
   @Column({
     type: 'numeric',
@@ -83,7 +83,7 @@ export class Order {
     enum: Currency,
     default: Currency.MXN,
   })
-  currency: string;
+  currency: Currency;
 
   @CreateDateColumn()
   readonly createdDate: Date;

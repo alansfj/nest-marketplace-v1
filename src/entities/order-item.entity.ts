@@ -85,7 +85,7 @@ export class OrderItem {
     enum: Currency,
     default: Currency.MXN,
   })
-  currency: string;
+  currency: Currency;
 
   @Column({
     type: 'numeric',
