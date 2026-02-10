@@ -6,6 +6,7 @@ import {
   DeleteDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -18,6 +19,7 @@ import { nonEmptyStringSchema } from 'src/common/schemas/not-empty-string.schema
 import { validateNewEntity } from 'src/common/utils/validate-new-entity';
 import { SelectableColumns } from 'src/types/selectable-columns.type';
 import { MONEY_SCALE } from 'src/common/constants/money-scale';
+import { OrderItem } from './order-item.entity';
 
 const newEntitySchema = z.object({
   name: nonEmptyStringSchema(),
@@ -98,6 +100,9 @@ export class Product {
     nullable: false,
   })
   user: Partial<User>;
+
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.product)
+  orderItems: OrderItem[];
 
   @CreateDateColumn()
   readonly createdDate: Date;
