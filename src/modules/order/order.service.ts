@@ -9,6 +9,7 @@ import { IUserService } from 'src/types/user/user.service.interface';
 import { IProductService } from 'src/types/product/product.service.interface';
 import { OrderStatus } from 'src/types/order-status.type';
 import { Money } from 'src/common/value-objects/money';
+import { IOrderItemService } from 'src/types/order-item/order-item.service.interface';
 
 @Injectable()
 export class OrderService implements IOrderService {
@@ -16,6 +17,7 @@ export class OrderService implements IOrderService {
     private readonly orderRepository: IOrderRepository,
     private readonly userService: IUserService,
     private readonly productService: IProductService,
+    private readonly orderItemService: IOrderItemService,
   ) {}
 
   @Transactional()
@@ -59,6 +61,16 @@ export class OrderService implements IOrderService {
 
       order = await this.orderRepository.save(newOrderEntity);
     }
+
+    //TODO: crear los registros de la tabla order_items
+
+    const orderItems = await this.orderItemService.addItemToOrder(
+      order,
+      product,
+      dto.productQuantity,
+    );
+
+    console.log(orderItems);
 
     return order;
   }

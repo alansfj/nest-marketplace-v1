@@ -9,9 +9,15 @@ import { IOrderRepository } from 'src/types/order/order.repository.interface';
 import { OrderTypeormRepository } from './order.repository';
 import { UserModule } from '../user/user.module';
 import { ProductModule } from '../product/product.module';
+import { OrderItemModule } from '../order-item/order-item.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Order]), UserModule, ProductModule],
+  imports: [
+    TypeOrmModule.forFeature([Order]),
+    UserModule,
+    ProductModule,
+    OrderItemModule,
+  ],
   controllers: [OrderController],
   providers: [
     {

@@ -22,4 +22,11 @@ export class OrderItemTypeormRepository
   ) {
     super(repo);
   }
+
+  async findManyByOrderIdWithProduct(orderId: number): Promise<OrderItem[]> {
+    return await this.qb()
+      .leftJoinAndSelect(`${this.alias}.product`, 'product')
+      .where(`${this.alias}.orderId = :orderId`, { orderId })
+      .getMany();
+  }
 }
