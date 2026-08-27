@@ -20,9 +20,14 @@ export class ProductTypeormRepository
     super(repo);
   }
 
-  async findOneByIdWithOwner(id: number): Promise<Product | null> {
+  async findOneByIdForUpdateWithOwner(id: number): Promise<Product | null> {
     return await this.qb()
       .leftJoinAndSelect(`${this.alias}.user`, 'user')
+      // Postgres can't lock the nullable side of an outer join, so scope
+      // the lock to this table only. The alias must be quoted here since
+      // TypeORM inserts lockTables verbatim and Postgres folds unquoted
+      // identifiers to lowercase, which wouldn't match our uppercase alias.
+      .setLock('pessimistic_write', undefined, [`"${this.alias}"`])
       .where(`${this.alias}.id = :id`, { id })
       .getOne();
   }

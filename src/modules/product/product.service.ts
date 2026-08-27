@@ -29,7 +29,8 @@ export class ProductService implements IProductService {
 
   @Transactional()
   async getProductByIdWithOwner(id: number): Promise<Product> {
-    const product = await this.productRepository.findOneByIdWithOwner(id);
+    const product =
+      await this.productRepository.findOneByIdForUpdateWithOwner(id);
 
     if (product) return product;
 
