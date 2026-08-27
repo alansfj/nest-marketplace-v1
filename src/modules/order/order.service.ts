@@ -46,6 +46,12 @@ export class OrderService implements IOrderService {
       user.id,
     );
 
+    if (order && order.currency !== product.currency) {
+      throw new BadRequestException(
+        'This product currency does not match your cart currency',
+      );
+    }
+
     if (!order) {
       const subtotalAmount = Money.from(product.price)
         .multiply(dto.productQuantity)
@@ -62,15 +68,28 @@ export class OrderService implements IOrderService {
       order = await this.orderRepository.save(newOrderEntity);
     }
 
-    //TODO: crear los registros de la tabla order_items
-
     const orderItems = await this.orderItemService.addItemToOrder(
       order,
       product,
       dto.productQuantity,
     );
 
-    console.log(orderItems);
+    const total = orderItems.reduce(
+      (sum, item) => sum.add(Money.from(item.totalAmount)),
+      Money.zero(),
+    );
+
+    order.subtotalAmount = total.toString();
+    order.totalAmount = total.toString();
+
+    order = await this.orderRepository.save(order);
+
+    // Break the order <-> orderItem back-reference so the response
+    // interceptor doesn't choke on a circular structure.
+    order.orderItems = orderItems.map((item) => ({
+      ...item,
+      order: undefined as unknown as Order,
+    }));
 
     return order;
   }

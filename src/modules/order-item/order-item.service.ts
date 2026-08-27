@@ -30,11 +30,11 @@ export class OrderItemService implements IOrderItemService {
         );
       }
 
-      const totalPrice = Money.from(orderItem.price);
-      const subtotalAmount = totalPrice.multiply(productsInOrder).toString();
+      const currentPrice = Money.from(product.price);
+      const subtotalAmount = currentPrice.multiply(productsInOrder).toString();
 
       orderItem.price = product.price;
-      orderItem.quantity += productQuantity;
+      orderItem.quantity = productsInOrder;
       orderItem.subtotalAmount = subtotalAmount;
       orderItem.totalAmount = subtotalAmount;
 

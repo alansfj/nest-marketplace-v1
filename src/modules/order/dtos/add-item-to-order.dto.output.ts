@@ -1,4 +1,6 @@
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, Type } from 'class-transformer';
+
+import { OrderItemDtoOutput } from 'src/modules/order-item/dtos/order-item.dto.output';
 
 @Exclude()
 export class AddItemToOrderDtoOutput {
@@ -19,4 +21,8 @@ export class AddItemToOrderDtoOutput {
 
   @Expose()
   createdDate: Date;
+
+  @Expose()
+  @Type(() => OrderItemDtoOutput)
+  orderItems: OrderItemDtoOutput[];
 }
