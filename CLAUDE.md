@@ -137,3 +137,9 @@ Si una entidad se serializa dentro de otra con relación circular (p. ej. `order
 
 - Módulo más completo y reciente: `src/modules/order` + `src/modules/order-item` (entidad validada, repo con query custom, servicio con lógica de negocio, DTOs con relación anidada)
 - Módulo más simple para copiar la estructura mínima: `src/modules/category`
+
+## Skills y patrón portable (`docs/nest-ddd-pattern/`)
+
+Las skills en `.claude/skills/` (`new-entity`, `new-dto`, `new-resource`) documentan este mismo patrón de arquitectura de forma **agnóstica al dominio** (sin mencionar orders/products/etc.), para poder aplicarlo en cualquier proyecto que use este stack, no solo en este ecommerce.
+
+`docs/nest-ddd-pattern/` contiene copias de las utilidades genéricas que esas skills referencian (`BaseTypeormRepository`, `validateNewEntity`, `ZodValidationPipe`, `DtoOutputInterceptor`, etc. — idénticas en contenido a sus equivalentes en `src/common/` y `src/types/`, pero viviendo fuera de `src/` porque son material de referencia, no código que la app importe). Si cambias alguna de estas utilidades en `src/`, actualiza también su copia en `docs/nest-ddd-pattern/` para que las skills sigan siendo precisas.

@@ -1,22 +1,27 @@
 ---
 name: new-resource
-description: Scaffoldea un módulo/recurso nuevo completo (repositorio con interfaz abstracta, servicio con interfaz abstracta, controller, módulo, DTOs) siguiendo el patrón de inyección de dependencias por clases abstractas de este proyecto. Usar cuando el usuario pida crear un nuevo módulo, recurso o dominio desde cero (ej. "agrega un módulo de reviews", "necesito un CRUD de X").
+description: Scaffoldea un módulo/recurso nuevo completo (repositorio con interfaz abstracta, servicio con interfaz abstracta, controller, módulo, DTOs) siguiendo el patrón de inyección de dependencias por clases abstractas, independiente del dominio del proyecto. Usar cuando el usuario pida crear un nuevo módulo, recurso o dominio desde cero (ej. "agrega un módulo de reviews", "necesito un CRUD de X").
 ---
 
 # Scaffoldear un nuevo módulo/recurso
 
-NestJS no puede inyectar por `interface` de TypeScript en runtime (se borran al compilar). Este proyecto resuelve eso usando **clases abstractas como tokens de inyección** para tanto repositorios como servicios. Sigue este orden exacto — es el mismo que siguen todos los módulos existentes.
+NestJS no puede inyectar por `interface` de TypeScript en runtime (se borran al compilar). Este patrón resuelve eso usando **clases abstractas como tokens de inyección**, tanto para repositorios como para servicios. Sigue este orden — es el mismo en todos los módulos que siguen este patrón.
 
-Referencias: `src/modules/category` (el módulo más simple, cópialo como punto de partida) y `src/modules/order-item` (ejemplo con lógica de negocio real y método de repositorio custom).
+Si el recurso necesita una entidad nueva, usa primero la skill `new-entity`. Para los DTOs de entrada/salida, usa `new-dto` junto con este scaffold.
 
-Si el recurso necesita una entidad nueva de TypeORM, usa primero la skill `new-entity`.
+Las utilidades base viven en `docs/nest-ddd-pattern/` de este proyecto:
+- `docs/nest-ddd-pattern/types/base-typeorm.repository.interface.ts` — `IBaseTypeormRepository<TEntity>`.
+- `docs/nest-ddd-pattern/common/repositories/base-typeorm.repository.ts` — `BaseTypeormRepository<TEntity>`, la implementación que cada repositorio concreto extiende.
+- `docs/nest-ddd-pattern/common/pipes/validation.pipe.ts` y `.../common/interceptors/dto-output.interceptor.ts` — usados por el controller (paso 5).
+
+Si estás en OTRO proyecto, copia esos archivos a tu `src/` primero (ver `docs/nest-ddd-pattern/README.md`).
 
 ## Orden de creación
 
-### 1. Interfaz del repositorio — `src/types/<nombre>/<nombre>.repository.interface.ts`
+### 1. Interfaz del repositorio — `types/<nombre>/<nombre>.repository.interface.ts`
 
 ```ts
-import { X } from 'src/entities/x.entity';
+import { X } from '../../entities/x.entity';
 import { IBaseTypeormRepository } from '../base-typeorm.repository.interface';
 
 export abstract class IXRepository extends IBaseTypeormRepository<X> {
@@ -26,16 +31,16 @@ export abstract class IXRepository extends IBaseTypeormRepository<X> {
 ```
 Si el módulo no necesita queries custom más allá de lo que da `BaseTypeormRepository`, el cuerpo queda vacío: `export abstract class IXRepository extends IBaseTypeormRepository<X> {}`.
 
-### 2. Implementación del repositorio — `src/modules/<nombre>/<nombre>.repository.ts`
+### 2. Implementación del repositorio — `modules/<nombre>/<nombre>.repository.ts`
 
 ```ts
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { BaseTypeormRepository } from 'src/common/repositories/base-typeorm.repository';
-import { X, TABLE_ALIAS_X } from 'src/entities/x.entity';
-import { IXRepository } from 'src/types/x/x.repository.interface';
+import { BaseTypeormRepository } from '../../common/repositories/base-typeorm.repository';
+import { X, TABLE_ALIAS_X } from '../../entities/x.entity';
+import { IXRepository } from '../../types/x/x.repository.interface';
 
 @Injectable()
 export class XTypeormRepository
@@ -56,26 +61,24 @@ export class XTypeormRepository
   }
 }
 ```
-Para queries que necesiten lock (`setLock('pessimistic_write')`) combinado con un `leftJoinAndSelect`, revisa el gotcha documentado en `CLAUDE.md` sobre `lockTables` y alias entrecomillados.
 
-### 3. Interfaz del servicio — `src/types/<nombre>/<nombre>.service.interface.ts`
+### 3. Interfaz del servicio — `types/<nombre>/<nombre>.service.interface.ts`
 
 ```ts
-import { X } from 'src/entities/x.entity';
+import { X } from '../../entities/x.entity';
 
 export abstract class IXService {
-  abstract metodoDeNegocio(userId: number, dto: AlgunDtoInput): Promise<X>;
+  abstract metodoDeNegocio(dto: AlgunDtoInput): Promise<X>;
 }
 ```
 
-### 4. Implementación del servicio — `src/modules/<nombre>/<nombre>.service.ts`
+### 4. Implementación del servicio — `modules/<nombre>/<nombre>.service.ts`
 
 ```ts
 import { Injectable } from '@nestjs/common';
-import { Transactional } from 'typeorm-transactional';
 
-import { IXRepository } from 'src/types/x/x.repository.interface';
-import { IXService } from 'src/types/x/x.service.interface';
+import { IXRepository } from '../../types/x/x.repository.interface';
+import { IXService } from '../../types/x/x.service.interface';
 
 @Injectable()
 export class XService implements IXService {
@@ -85,25 +88,22 @@ export class XService implements IXService {
     // private readonly otherService: IOtherService,
   ) {}
 
-  @Transactional() // solo si el método hace más de una escritura relacionada, o usa locks *ForUpdate*
-  async metodoDeNegocio(userId: number, dto: AlgunDtoInput) {
-    // lanzar BadRequestException/UnauthorizedException con mensajes claros en vez de dejar que explote
+  async metodoDeNegocio(dto: AlgunDtoInput) {
+    // lanzar BadRequestException con un mensaje claro en vez de dejar que explote
   }
 }
 ```
 
-### 5. Controller — `src/modules/<nombre>/<nombre>.controller.ts`
+### 5. Controller — `modules/<nombre>/<nombre>.controller.ts`
 
 Usa la skill `new-dto` para los DTOs de entrada/salida antes o junto con este paso.
 
 ```ts
 import { Body, Controller, Post, UseInterceptors } from '@nestjs/common';
 
-import { UserInReq } from 'src/common/decorators/user-in-req.decorator';
-import { ZodValidationPipe } from 'src/common/pipes/validation.pipe';
-import { DtoOutputInterceptor } from 'src/common/interceptors/dto-output.interceptor';
-import { IAuthUser } from 'src/types/auth-user.interface';
-import { IXService } from 'src/types/x/x.service.interface';
+import { ZodValidationPipe } from '../../common/pipes/validation.pipe';
+import { DtoOutputInterceptor } from '../../common/interceptors/dto-output.interceptor';
+import { IXService } from '../../types/x/x.service.interface';
 
 @Controller('x')
 export class XController {
@@ -112,25 +112,25 @@ export class XController {
   @Post()
   @UseInterceptors(new DtoOutputInterceptor(XActionDtoOutput))
   xAction(
-    @UserInReq() user: IAuthUser,
     @Body(new ZodValidationPipe(xActionSchema)) dto: XActionDtoInput,
   ) {
-    return this.xService.xAction(user.id, dto);
+    return this.xService.xAction(dto);
   }
 }
 ```
+Si el proyecto tiene autenticación, el usuario en sesión normalmente se obtiene vía un decorador de parámetro propio del proyecto (ej. algo como `@UserInReq()`) que lee `req.user` — revisa cómo lo hacen los demás controllers del proyecto en vez de inventar uno nuevo.
 
-### 6. Módulo — `src/modules/<nombre>/<nombre>.module.ts`
+### 6. Módulo — `modules/<nombre>/<nombre>.module.ts`
 
 ```ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { X } from 'src/entities/x.entity';
+import { X } from '../../entities/x.entity';
 import { XController } from './x.controller';
-import { IXService } from 'src/types/x/x.service.interface';
+import { IXService } from '../../types/x/x.service.interface';
 import { XService } from './x.service';
-import { IXRepository } from 'src/types/x/x.repository.interface';
+import { IXRepository } from '../../types/x/x.repository.interface';
 import { XTypeormRepository } from './x.repository';
 
 @Module({
@@ -150,24 +150,46 @@ export class XModule {}
 
 ### 7. Registrar en el módulo padre
 
-- Si otro módulo va a inyectar `IXService`, agregar `XModule` a sus `imports` (ver cómo `order.module.ts` importa `OrderItemModule`).
-- Siempre agregar el nuevo módulo a `imports` de `AppModule` (`src/app.module.ts`).
+- Si otro módulo va a inyectar `IXService`, agrega `XModule` a sus `imports`.
+- Agrega el nuevo módulo a `imports` del módulo raíz de la aplicación.
 
 ### 8. Verificar
 
 ```bash
 npm run build    # tsc debe pasar sin errores
 npm run lint
-npm run format
 ```
-Si agregaste una entidad nueva, no olvides la migración (`npm run migration:generate` + `migration:run`) antes de probar el endpoint.
+Si agregaste una entidad nueva, no olvides generar y correr la migración antes de probar el endpoint.
+
+## Transacciones y locking (cuando aplique)
+
+Si un método hace **múltiples escrituras relacionadas**, envuélvelo en `@Transactional()` (de la librería `typeorm-transactional`, si el proyecto la usa). Si el método depende de un valor que otra request concurrente podría cambiar antes de terminar (stock, saldo, cupos disponibles...), usa la variante `*ForUpdate` del repositorio (lock pesimista) en vez de la `*ReadOnly`.
+
+**Gotcha de locking + joins**: combinar un lock (`setLock('pessimistic_write')`) con un `leftJoinAndSelect` falla en Postgres — "no se puede bloquear el lado nullable de un outer join" — a menos que acotes el lock a una sola tabla con `FOR UPDATE OF <tabla>`. TypeORM expone esto como tercer argumento de `setLock` (`lockTables`), pero inserta el alias **sin comillas**; si tu alias va en mayúsculas, Postgres lo pliega a minúsculas y no lo encuentra. Hay que pasarlo ya entrecomillado:
+```ts
+.setLock('pessimistic_write', undefined, [`"${this.alias}"`])
+```
+
+**Testear un método con `@Transactional()`**: el decorador necesita una `DataSource` real e inicializada para abrir una transacción — en un test unitario, mockéalo como un passthrough en vez de intentar levantar una base de datos real:
+```ts
+jest.mock('typeorm-transactional', () => ({
+  ...jest.requireActual('typeorm-transactional'),
+  Transactional: () => (
+    _target: unknown,
+    _key: string,
+    descriptor: PropertyDescriptor,
+  ) => descriptor,
+}));
+```
+La lógica de negocio de ese método sí se puede (y debe) probar con mocks normales del repositorio/otros servicios — lo único que no se puede verificar con mocks es el SQL/lock real; eso necesita un test e2e contra una base de datos real.
 
 ## Checklist rápido
 
-- [ ] `I<X>Repository` (abstract class) en `src/types/<x>/`
+- [ ] `I<X>Repository` (abstract class) extiende `IBaseTypeormRepository<X>`
 - [ ] `<X>TypeormRepository` extiende `BaseTypeormRepository<X>` e implementa la interfaz
-- [ ] `I<X>Service` (abstract class) en `src/types/<x>/`
-- [ ] `<X>Service` implementa la interfaz, inyecta otras dependencias por su interfaz
+- [ ] `I<X>Service` (abstract class) con los métodos del dominio
+- [ ] `<X>Service` implementa la interfaz, inyecta otras dependencias por su interfaz (nunca la clase concreta)
 - [ ] Controller usa `ZodValidationPipe` + `DtoOutputInterceptor`, nunca valida/transforma a mano
 - [ ] Módulo provee ambos pares `{ provide: Interfaz, useClass: Implementacion }` y exporta solo la interfaz del servicio
-- [ ] Módulo registrado en el módulo padre correspondiente y/o en `AppModule`
+- [ ] Módulo registrado en el módulo padre correspondiente
+- [ ] Si hay escrituras relacionadas o datos sensibles a concurrencia, se evaluó `@Transactional()` y el lock `*ForUpdate` correspondiente
