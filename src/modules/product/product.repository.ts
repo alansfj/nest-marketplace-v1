@@ -31,4 +31,19 @@ export class ProductTypeormRepository
       .where(`${this.alias}.id = :id`, { id })
       .getOne();
   }
+
+  async findAllPaginatedWithRelations(options: {
+    limit: number;
+    offset: number;
+  }): Promise<{ items: Product[]; total: number }> {
+    const [items, total] = await this.qb()
+      .leftJoinAndSelect(`${this.alias}.store`, 'store')
+      .leftJoinAndSelect(`${this.alias}.subcategory`, 'subcategory')
+      .orderBy(`${this.alias}.id`, 'DESC')
+      .skip(options.offset)
+      .take(options.limit)
+      .getManyAndCount();
+
+    return { items, total };
+  }
 }

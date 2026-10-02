@@ -45,6 +45,7 @@ describe('ProductService', () => {
     productRepository = {
       findOneByIdForUpdate: jest.fn(),
       findOneByIdForUpdateWithOwner: jest.fn(),
+      findAllPaginatedWithRelations: jest.fn(),
       save: jest.fn((entity) => Promise.resolve(entity)),
     } as unknown as jest.Mocked<IProductRepository>;
     subcategoryService = {
@@ -134,6 +135,33 @@ describe('ProductService', () => {
       expect(result.user).toBe(user);
       expect(result.subcategory).toBe(subcategory);
       expect(result.store).toBe(store);
+    });
+  });
+
+  describe('listProducts', () => {
+    it('passes the requested limit and offset to the repository', async () => {
+      productRepository.findAllPaginatedWithRelations.mockResolvedValue({
+        items: [],
+        total: 0,
+      });
+
+      await service.listProducts({ limit: 10, offset: 20 });
+
+      expect(
+        productRepository.findAllPaginatedWithRelations,
+      ).toHaveBeenCalledWith({ limit: 10, offset: 20 });
+    });
+
+    it('returns the items and total from the repository alongside the requested pagination', async () => {
+      const items = [buildProduct({ id: 1 }), buildProduct({ id: 2 })];
+      productRepository.findAllPaginatedWithRelations.mockResolvedValue({
+        items,
+        total: 2,
+      });
+
+      const result = await service.listProducts({ limit: 10, offset: 0 });
+
+      expect(result).toEqual({ items, total: 2, limit: 10, offset: 0 });
     });
   });
 });

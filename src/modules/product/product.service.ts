@@ -3,6 +3,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Product } from 'src/entities/product.entity';
 import { IProductService } from 'src/types/product/product.service.interface';
 import { CreateProductDtoInput } from './dtos/create-product.dto.input';
+import { ListProductsDtoInput } from './dtos/list-products.dto.input';
 import { IProductRepository } from 'src/types/product/product.repository.interface';
 import { ISubcategoryService } from 'src/types/subcategory/subcategory.service.interface';
 import { IUserService } from 'src/types/user/user.service.interface';
@@ -60,5 +61,20 @@ export class ProductService implements IProductService {
     });
 
     return await this.productRepository.save(newProductEntity);
+  }
+
+  async listProducts(dto: ListProductsDtoInput): Promise<{
+    items: Product[];
+    total: number;
+    limit: number;
+    offset: number;
+  }> {
+    const { items, total } =
+      await this.productRepository.findAllPaginatedWithRelations({
+        limit: dto.limit,
+        offset: dto.offset,
+      });
+
+    return { items, total, limit: dto.limit, offset: dto.offset };
   }
 }
